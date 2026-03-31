@@ -9,7 +9,7 @@ Collection of ScyllaDB agent skills for use in agentic workflows. These skills p
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/zseta/scylladb-agent-skills.git
+   git clone https://github.com/zseta/agent-skills.git
    ```
 
 2. Install the skills for your platform:
