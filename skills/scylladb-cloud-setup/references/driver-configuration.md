@@ -6,7 +6,6 @@ tags: drivers, Python, Java, Go, Rust, C#, Node.js, connection, shard-aware, DC-
 # ScyllaDB Driver Configuration
 
 All examples connect to a ScyllaDB Cloud cluster with:
-- TLS enabled
 - DC-aware load balancing policy (required)
 - `PlainTextAuthProvider` for authentication
 
@@ -21,20 +20,17 @@ pip install scylla-driver
 ```
 
 ```python
-import ssl
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.policies import DCAwareRoundRobinPolicy
 
 auth = PlainTextAuthProvider(username='scylla', password='YOUR_PASSWORD')
-ssl_context = ssl.create_default_context()
 
 cluster = Cluster(
     contact_points=['node-0.your-cluster.cloud.scylladb.com'],
     port=9042,
     auth_provider=auth,
     load_balancing_policy=DCAwareRoundRobinPolicy(local_dc='AWS_US_EAST_1'),
-    ssl_context=ssl_context,
 )
 session = cluster.connect()
 
@@ -60,14 +56,12 @@ Maven dependency:
 
 ```java
 import com.datastax.oss.driver.api.core.CqlSession;
-import javax.net.ssl.SSLContext;
 import java.net.InetSocketAddress;
 
 CqlSession session = CqlSession.builder()
     .addContactPoint(new InetSocketAddress("node-0.your-cluster.cloud.scylladb.com", 9042))
     .withLocalDatacenter("AWS_US_EAST_1")
     .withAuthCredentials("scylla", "YOUR_PASSWORD")
-    .withSslContext(SSLContext.getDefault())
     .build();
 
 session.execute("SELECT release_version FROM system.local")
@@ -90,7 +84,6 @@ go get github.com/scylladb/gocql
 package main
 
 import (
-    "crypto/tls"
     "fmt"
     "log"
 
@@ -103,9 +96,6 @@ func main() {
     cluster.Authenticator = gocql.PasswordAuthenticator{
         Username: "scylla",
         Password: "YOUR_PASSWORD",
-    }
-    cluster.SslOpts = &gocql.SslOptions{
-        Config: &tls.Config{},
     }
     cluster.PoolConfig.HostSelectionPolicy = gocql.DCAwareRoundRobinPolicy("AWS_US_EAST_1")
 
@@ -145,7 +135,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let session = SessionBuilder::new()
         .known_node("node-0.your-cluster.cloud.scylladb.com:9042")
         .user("scylla", "YOUR_PASSWORD")
-        .ssl_context(Some(native_tls::TlsConnector::builder().build()?.into()))
         .build()
         .await?;
 
@@ -175,7 +164,6 @@ var cluster = Cluster.Builder()
     .AddContactPoint("node-0.your-cluster.cloud.scylladb.com")
     .WithPort(9042)
     .WithCredentials("scylla", "YOUR_PASSWORD")
-    .WithSSL()
     .WithLoadBalancingPolicy(new TokenAwarePolicy(
         new DCAwareRoundRobinPolicy("AWS_US_EAST_1")))
     .Build();

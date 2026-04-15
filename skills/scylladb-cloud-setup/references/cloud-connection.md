@@ -1,6 +1,6 @@
 ---
 title: ScyllaDB Cloud Connection Details
-tags: cloud, connection, TLS, mTLS, credentials, IP allowlist, VPC peering
+tags: cloud, connection, credentials, IP allowlist, VPC peering
 ---
 
 # ScyllaDB Cloud Connection Details
@@ -54,6 +54,5 @@ The exact datacenter name is shown on the cluster's **Connect** tab. Always copy
 | Error | Cause | Fix |
 |-------|-------|-----|
 | Connection refused | IP not in Allowed IPs | Add client IP to Allowed IPs |
-| SSL handshake failure | TLS not configured in driver | Add SSL context to driver config |
 | Authentication failed | Wrong username/password | Verify credentials on Connect tab |
 | No hosts available | Wrong contact points or DC name | Check node addresses and DC name on Connect tab |

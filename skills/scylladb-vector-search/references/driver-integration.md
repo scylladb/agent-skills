@@ -26,24 +26,21 @@ tags: vector-search, drivers, Python, Java, Go, Rust, DC-aware, shard-aware
 
 ## Connection Examples
 
-All examples connect to ScyllaDB Cloud with TLS and DC-aware load balancing.
+All examples connect to ScyllaDB Cloud with DC-aware load balancing.
 
 ### Python
 
 ```python
-import ssl
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.policies import DCAwareRoundRobinPolicy
 
 auth = PlainTextAuthProvider(username='scylla', password='YOUR_PASSWORD')
-ssl_context = ssl.create_default_context()
 cluster = Cluster(
     contact_points=['node-0.your-cluster.cloud.scylladb.com'],
     port=9042,
     auth_provider=auth,
     load_balancing_policy=DCAwareRoundRobinPolicy(local_dc='AWS_US_EAST_1'),
-    ssl_context=ssl_context,
 )
 session = cluster.connect('myapp')
 

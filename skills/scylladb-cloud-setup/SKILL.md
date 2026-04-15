@@ -1,6 +1,6 @@
 ---
 name: scylladb-cloud-setup
-description: Guide users through connecting to a ScyllaDB Cloud cluster. Use this skill when a user needs to connect to ScyllaDB Cloud, configure driver credentials, set up TLS/mTLS, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
+description: Guide users through connecting to a ScyllaDB Cloud cluster. Use this skill when a user needs to connect to ScyllaDB Cloud, configure driver credentials, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
 ---
 
 # ScyllaDB Cloud Connection Setup
@@ -68,7 +68,7 @@ Consult `references/driver-configuration.md` for per-language connection snippet
 1. **DC-aware load balancing policy** — must be configured with the correct datacenter name. Without it, the driver may attempt to route queries to nodes in the wrong DC or fail to connect entirely.
 2. **Authentication** — `PlainTextAuthProvider` with the username and password from Step 2.
 
-Consult `references/cloud-connection.md` for details on TLS, IP allowlisting, and VPC peering.
+Consult `references/cloud-connection.md` for details on IP allowlisting and VPC peering.
 
 ## Step 5: Test the Connection
 
