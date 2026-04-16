@@ -1,22 +1,36 @@
 # ScyllaDB Agent Skills
 
-Collection of ScyllaDB agent skills for use in agentic workflows. These skills provide coding agents with deep knowledge of ScyllaDB Cloud, CQL data modeling, and Vector Search.
+Collection of ScyllaDB agent skills for use in agentic workflows. These skills provide coding agents with deep knowledge of ScyllaDB Cloud, ScyllaDB data modeling, and ScyllaDB Vector Search.
 
 ## Installation
 
-### Local install from repository
+## CLI
+```sh
+npx skills add scylladb/agent-skills
+```
 
-1. Clone the repository:
+### Install specific skills
+```sh
+npx skills add scylladb/agent-skills --skill scylladb-cloud-setup
+npx skills add scylladb/agent-skills --skill scylladb-data-modeling
+npx skills add scylladb/agent-skills --skill scylladb-vector-search
+```
 
-   ```bash
-   git clone https://github.com/zseta/agent-skills.git
-   ```
+## Claude Code plugin
+```sh
+claude plugin marketplace add scylladb/agent-skills
 
-2. Install the skills for your platform:
+claude plugin install scylladb-cloud-setup@scylladb
+claude plugin install scylladb-data-modeling@scylladb
+claude plugin install scylladb-vector-search@scylladb
+```
 
-   Copy the `skills/` directory to the location where your coding agent
-   reads its skills or context files. Refer to your agent's documentation
-   for the correct path.
+## Cursor plugin
+Install from the Cursor marketplace: https://cursor.com/marketplace/scylladb
+
+```sh
+/add-plugin scylladb
+```
 
 ## Skills
 
@@ -25,3 +39,27 @@ Collection of ScyllaDB agent skills for use in agentic workflows. These skills p
 | [scylladb-cloud-setup](skills/scylladb-cloud-setup/SKILL.md) | Guide users through connecting to a ScyllaDB Cloud cluster — credentials, drivers, and connection verification. |
 | [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, and common pitfalls. |
 | [scylladb-vector-search](skills/scylladb-vector-search/SKILL.md) | Implement and optimize Vector Search on ScyllaDB Cloud — vector indexes, ANN queries, filtering, quantization, and driver integration. |
+
+The skills follow the [Agent Skills format](https://agentskills.io).
+
+## Development
+
+### Validating skills locally
+
+Install the validator (requires [Go](https://go.dev/doc/install)):
+
+```sh
+go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@latest
+```
+
+Validate all skills:
+
+```sh
+./tests/validate-skills.sh
+```
+
+Validate a specific skill:
+
+```sh
+./tests/validate-skills.sh skills/scylladb-cloud-setup/
+```
