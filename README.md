@@ -26,8 +26,11 @@ claude plugin install scylladb-vector-search@scylladb
 ```
 
 ## Cursor plugin
+Install from the Cursor marketplace: https://cursor.com/marketplace/scylladb
 
-
+```sh
+/add-plugin scylladb
+```
 
 ## Skills
 
