@@ -14,21 +14,25 @@
       "source": "./",
       "description": "Guide users through connecting to a ScyllaDB Cloud cluster. Use when a user needs to connect to ScyllaDB Cloud, configure driver credentials, or troubleshoot connection issues.",
       "strict": false,
-      "skills": ["./skills/scylladb-cloud-setup"]
+      "skills": ["./skills/scylladb-cloud-setup"],
+      "tags": ["scylla", "database", "scylladb", "cql"]
     },
     {
       "name": "scylladb-data-modeling",
       "source": "./",
       "description": "ScyllaDB CQL data modeling patterns and anti-patterns. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, or troubleshooting performance issues caused by schema problems.",
       "strict": false,
-      "skills": ["./skills/scylladb-data-modeling"]
+      "skills": ["./skills/scylladb-data-modeling"],
+      "tags": ["scylla", "database", "scylladb", "cql", "data modeling", "schema"]
     },
     {
       "name": "scylladb-vector-search",
       "source": "./",
       "description": "Guides ScyllaDB Cloud users through implementing and optimizing Vector Search for semantic similarity, RAG, and recommendation use cases.",
       "strict": false,
-      "skills": ["./skills/scylladb-vector-search"]
+      "skills": ["./skills/scylladb-vector-search"],
+      "tags": ["scylla", "database", "scylladb", "cql", "vector search", "semantic search", "embeddings", "RAG"]
+
     }
   ]
 }
