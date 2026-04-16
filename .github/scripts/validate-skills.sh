@@ -22,12 +22,16 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
 }
 cd "$REPO_ROOT"
 
-# Diff against the PR base branch, fall back to main.
-BASE_BRANCH="${GITHUB_BASE_REF:-main}"
+# For PRs, diff against the base branch. For direct pushes, diff against the previous commit.
+if [ -n "${GITHUB_BASE_REF:-}" ]; then
+  DIFF_BASE="origin/${GITHUB_BASE_REF}"
+else
+  DIFF_BASE="HEAD~1"
+fi
 
 # Find all skill directories that contain modified files.
 changed_skills=$(
-  git diff --name-only "origin/${BASE_BRANCH}...HEAD" \
+  git diff --name-only "${DIFF_BASE}...HEAD" \
   | grep '^skills/' \
   | sed 's|^\(skills/[^/]*\)/.*|\1|' \
   | sort -u \
