@@ -1,0 +1,22 @@
+{
+  "name": "scylladb",
+  "version": "1.0.0",
+  "description": "Official Cursor plugin for ScyllaDB Agent Skills.",
+  "author": {
+    "name": "ScyllaDB",
+    "email": "support@scylladb.com",
+    "url": "https://www.scylladb.com"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/scylladb/agent-skills",
+  "keywords": [
+    "scylla", 
+    "database", 
+    "scylladb", 
+    "cql",
+    "vector search",
+    "nosql"
+  ],
+  "logo": "./assets/scylladb-logo-vertical.png",
+  "skills": "./skills/"
+}
