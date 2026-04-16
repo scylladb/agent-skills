@@ -64,7 +64,7 @@ Always consult the appropriate reference file(s) before recommending indexes or 
 
 **Typical implementation order:**
 
-1. Create a keyspace (tablets enabled — default in ScyllaDB Cloud)
+1. Create a keyspace (tablets are enabled by default)
 2. Create a table with a `vector<float, N>` column
 3. Insert vectors (from your embedding pipeline)
 4. Create a vector index (`CREATE CUSTOM INDEX ... USING 'vector_index'`)
