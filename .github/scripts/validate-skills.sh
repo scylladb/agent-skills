@@ -30,7 +30,8 @@ changed_skills=$(
   git diff --name-only "origin/${BASE_BRANCH}...HEAD" \
   | grep '^skills/' \
   | sed 's|^\(skills/[^/]*\)/.*|\1|' \
-  | sort -u
+  | sort -u \
+  || true
 )
 
 if [ -z "$changed_skills" ]; then
