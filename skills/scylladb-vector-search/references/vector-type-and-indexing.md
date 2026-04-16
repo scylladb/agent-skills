@@ -17,16 +17,13 @@ The `VECTOR` data type stores fixed-length numeric vectors as a native CQL colum
 
 ### Tablets Requirement
 
-⚠️ **Tables with vector columns MUST reside in a keyspace with tablets enabled.** ScyllaDB Cloud enables tablets by default in all new keyspaces. For older clusters, explicitly enable tablets:
+⚠️ **Tables with vector columns MUST reside in a keyspace with tablets enabled.** Tablets are enabled by default in ScyllaDB, so a standard keyspace creation works:
 
 ```sql
 CREATE KEYSPACE myapp
 WITH replication = {
   'class': 'NetworkTopologyStrategy',
   'replication_factor': 3
-}
-AND tablets = {
-   'enabled': true
 };
 ```
 
