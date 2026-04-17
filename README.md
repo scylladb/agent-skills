@@ -6,22 +6,22 @@ ScyllaDB CQL data modeling, and ScyllaDB Vector Search.
 
 ## Installation
 
-## CLI
+### CLI
 ```sh
 npx skills add scylladb/agent-skills
 ```
 
-### Install specific skills
+#### Install specific skills
 ```sh
 npx skills add scylladb/agent-skills --skill scylladb-cloud-setup
 npx skills add scylladb/agent-skills --skill scylladb-data-modeling
 npx skills add scylladb/agent-skills --skill scylladb-vector-search
 ```
 
-## Claude Code plugin
+### Claude Code plugin
 Coming soon.
 
-## Cursor plugin
+### Cursor plugin
 coming soon.
 
 ### Manual install
