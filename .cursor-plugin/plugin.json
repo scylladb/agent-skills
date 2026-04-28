@@ -1,0 +1,26 @@
+{
+  "name": "scylladb",
+  "displayName": "ScyllaDB Skills",
+  "version": "1.0.0",
+  "description": "Official ScyllaDB agent skills for Cursor and Claude Code. Bundles guided skills for Cloud setup, CQL data modeling, and Vector Search.",
+  "author": {
+    "name": "ScyllaDB",
+    "email": "support@scylladb.com",
+    "url": "https://www.scylladb.com"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/scylladb/agent-skills",
+  "keywords": [
+    "scylla",
+    "scylladb",
+    "database",
+    "nosql",
+    "cql",
+    "data modeling",
+    "vector search",
+    "semantic search",
+    "rag"
+  ],
+  "logo": "./assets/scylladb-logo-vertical.png",
+  "skills": "./skills/"
+}
