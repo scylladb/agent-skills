@@ -1,0 +1,34 @@
+{
+  "name": "scylladb",
+  "owner": {
+    "name": "ScyllaDB",
+    "email": "support@scylladb.com"
+  },
+  "metadata": {
+    "description": "Official ScyllaDB agent skills for Cursor",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "scylladb",
+      "displayName": "ScyllaDB Skills",
+      "source": "./",
+      "description": "Official ScyllaDB skills bundle: Cloud setup, CQL data modeling, and Vector Search. Each skill is invoked independently by the agent when relevant.",
+      "strict": false,
+      "skills": "./skills/",
+      "logo": "./assets/scylladb-logo-vertical.png",
+      "category": "database",
+      "tags": [
+        "scylla",
+        "scylladb",
+        "database",
+        "nosql",
+        "cql",
+        "data modeling",
+        "vector search",
+        "semantic search",
+        "rag"
+      ]
+    }
+  ]
+}
