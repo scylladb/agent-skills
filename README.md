@@ -22,7 +22,10 @@ npx skills add scylladb/agent-skills --skill scylladb-vector-search
 Coming soon.
 
 ### Cursor plugin
-coming soon.
+Available on the Cursor Marketplace: [ScyllaDB Agent Skills](https://cursor.com/marketplace/scylla-db).
+```sh
+/add-plugin scylladb
+```
 
 ### Manual install
 
