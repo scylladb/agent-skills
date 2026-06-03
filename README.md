@@ -23,6 +23,7 @@ Coming soon.
 
 ### Cursor plugin
 Available on the Cursor Marketplace: [ScyllaDB Agent Skills](https://cursor.com/marketplace/scylla-db).
+/add-plugin scylladb
 
 ### Manual install
 
