@@ -70,3 +70,6 @@ Validate a specific skill:
 ```sh
 ./tests/validate-skills.sh skills/scylladb-cloud-setup/
 ```
+
+## ScyllaDB Cloud MCP Server
+The [ScyllaDB Cloud MCP server](https://cloud.docs.scylladb.com/master/api-docs/mcp) enables AI agents to manage ScyllaDB Cloud clusters programmatically: create clusters, monitor health, configure networking, and more.

@@ -92,3 +92,4 @@ Once connected, suggest relevant next steps:
 - **Vector search**: Use the `scylladb-vector-search` skill if they need similarity search
 - **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing)
 - **Connection pooling**: ScyllaDB drivers handle pooling internally with shard-aware connections — typically no manual tuning needed
+- **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud cluster programmatically via an AI agent (create clusters, monitor health, configure networking, etc.), the ScyllaDB Cloud MCP server is available. See the full documentation at https://cloud.docs.scylladb.com/master/api-docs/mcp
