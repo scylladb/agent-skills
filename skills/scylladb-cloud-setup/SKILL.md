@@ -13,7 +13,6 @@ Connecting to ScyllaDB Cloud requires:
 
 1. **Cluster credentials** — username, password, and node addresses from the ScyllaDB Cloud Console
 2. **A ScyllaDB CQL driver** — installed for the user's programming language
-3. **DC-aware load balancing policy** — required for all ScyllaDB Cloud connections
 
 This is an interactive step-by-step guide. The agent detects the user's environment and provides tailored instructions.
 
@@ -39,7 +38,7 @@ Guide the user to obtain credentials from the Cloud Console:
    - **Port** — typically `9042`
    - **Username** — default is `scylla`
    - **Password** — shown on the Connect tab
-   - **Datacenter name** — e.g., `AWS_US_EAST_1` (required for DC-aware load balancing)
+   - **Datacenter name** — e.g., `AWS_US_EAST_1`
 
 **Do not ask for or handle credentials directly** — guide the user to retrieve them from the Console and store them securely (environment variables, secrets manager, etc.).
 
@@ -65,8 +64,7 @@ Consult `references/driver-configuration.md` for per-language connection snippet
 
 **Critical requirements for ScyllaDB Cloud:**
 
-1. **DC-aware load balancing policy** — must be configured with the correct datacenter name. Without it, the driver may attempt to route queries to nodes in the wrong DC or fail to connect entirely.
-2. **Authentication** — `PlainTextAuthProvider` with the username and password from Step 2.
+**Authentication** — `PlainTextAuthProvider` with the username and password from Step 2.
 
 Consult `references/cloud-connection.md` for details on IP allowlisting and VPC peering.
 

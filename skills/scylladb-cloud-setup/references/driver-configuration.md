@@ -6,7 +6,7 @@ tags: drivers, Python, Java, Go, Rust, C#, Node.js, connection, shard-aware, DC-
 # ScyllaDB Driver Configuration
 
 All examples connect to a ScyllaDB Cloud cluster with:
-- DC-aware load balancing policy (required)
+- DC-aware load balancing policy (recommended)
 - `PlainTextAuthProvider` for authentication
 
 ⚠️ **Use ScyllaDB drivers, not DataStax/Cassandra drivers.** ScyllaDB drivers include shard-aware routing that sends each query directly to the correct CPU core, dramatically improving throughput and reducing latency.
@@ -201,12 +201,6 @@ Refer to the [CPP RS Driver documentation](https://docs.scylladb.com/stable/driv
 ---
 
 ## Key Configuration Notes
-
-### DC-Aware Load Balancing (Required)
-Every ScyllaDB Cloud connection **must** use a DC-aware load balancing policy set to the cluster's datacenter name. Without it:
-- Queries may be routed to the wrong datacenter
-- Connection may fail entirely
-- Latency will be unpredictable
 
 ### Shard-Aware Routing
 ScyllaDB drivers automatically detect the shard-per-core architecture and route queries directly to the correct shard. This is transparent — no configuration needed beyond using the ScyllaDB driver (not the Cassandra driver).

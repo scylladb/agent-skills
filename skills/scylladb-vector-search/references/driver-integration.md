@@ -9,7 +9,6 @@ tags: vector-search, drivers, Python, Java, Go, Rust, DC-aware, shard-aware
 
 1. **ScyllaDB driver usage**: if there's an offical ScyllaDB driver in the given language, you must use that, instead of the Cassandra driver.
 1. **Driver must support the `vector` CQL type** — see minimum versions below
-1. **DC-aware load balancing policy is required** — vector search will not work without it
 
 ## Driver Version Requirements
 
@@ -27,7 +26,7 @@ tags: vector-search, drivers, Python, Java, Go, Rust, DC-aware, shard-aware
 
 ## Connection Examples
 
-All examples connect to ScyllaDB Cloud with DC-aware load balancing.
+All examples connect to ScyllaDB Cloud with DC-aware load balancing (which is the recommended load balancing policy).
 
 ### Python
 
