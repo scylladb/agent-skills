@@ -18,7 +18,6 @@ Vector Search is a **ScyllaDB Cloud feature**. It is not available in ScyllaDB O
 2. **Inspect schema first** — Check existing tables and indexes before making recommendations
 3. **Explain before executing** — Describe what indexes will be created and confirm before proceeding
 4. **Start with defaults** — Use default HNSW parameters and no quantization; tune only when needed
-5. **DC-aware is mandatory** — Vector Search requires the driver to use a DC-aware load balancing policy
 
 ## Workflow
 
@@ -78,7 +77,6 @@ After setup, verify:
 - The ANN query returns results (wait ~1 second after inserting vectors to account for write-to-query latency)
 - Similarity scores are in the expected range (0-1, higher = more similar)
 - Filtered queries return correctly filtered results
-- Driver is configured with DC-aware load balancing policy
 
 ## Anti-Patterns to Avoid
 
