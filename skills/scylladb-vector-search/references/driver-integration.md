@@ -22,7 +22,7 @@ tags: vector-search, drivers, Python, Java, Go, Rust, DC-aware, shard-aware
 | Rust (`scylla`) | 1.2.0 | Latest |
 | C# (`scylla-csharp-driver`) | All versions | Latest |
 | CPP RS (`cpp-rust-driver`) | 0.5.1 | Latest |
-| Node.js RS (`scylla-node-driver`) | All versions | Latest |
+| Javascript (`@scylladb/driver`) | All versions | Latest |
 
 ## Connection Examples
 
@@ -64,9 +64,9 @@ for row in rows:
     print(f"{row.title}: {row.score:.4f}")
 ```
 
-### Node.js (RS Driver)
+### Javascript (Node.js RS Driver)
 
-Refer to the [Node.js RS Driver documentation](https://docs.scylladb.com/stable/drivers/cql-drivers.html) for vector type examples. Built on a Rust core with full shard-aware routing.
+Refer to the [Node.js RS Driver documentation](https://nodejs-rs-driver.docs.scylladb.com/stable/).
 
 ### Java (4.x)
 
