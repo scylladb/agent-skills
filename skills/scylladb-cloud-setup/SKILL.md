@@ -54,7 +54,7 @@ Ask the user which programming language they are using so you can recommend the 
 | Rust | scylla-rust-driver | `cargo add scylla` |
 | C# | scylla-csharp-driver | NuGet package |
 | C++ | cpp-rust-driver | Build from source or vcpkg |
-| Node.js | scylla-node-driver | `npm install scylladb-driver-alpha` |
+| Node.js | scylla-node-driver | `npm install @scylladb/driver` |
 
 ⚠️ **Important**: ScyllaDB has its own driver forks — do **not** use the DataStax/Cassandra drivers - unless there's no ScyllaDB driver available for your language. ScyllaDB drivers include shard-aware optimizations that route requests directly to the correct CPU core, improving throughput and latency.
 

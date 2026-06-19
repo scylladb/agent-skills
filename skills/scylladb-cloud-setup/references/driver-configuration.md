@@ -1,6 +1,6 @@
 ---
 title: ScyllaDB Driver Configuration
-tags: drivers, Python, Java, Go, Rust, C#, Node.js, connection, shard-aware, DC-aware
+tags: drivers, Python, Java, Go, Rust, C#, javascript, Node.js, connection, shard-aware, DC-aware
 ---
 
 # ScyllaDB Driver Configuration
@@ -178,13 +178,15 @@ Console.WriteLine($"Connected to ScyllaDB {row.GetValue<string>("release_version
 
 ---
 
-## Node.js RS (`scylla-node-driver`)
+## Javascript (`@scylladb/driver`)
+A client-side driver for ScyllaDB written in Node.js and Rust. 
 
 ```bash
-npm install @aspect-build/scylla-driver
+npm install @scylladb/driver
 ```
 
-Refer to the [Node.js RS Driver documentation](https://docs.scylladb.com/stable/drivers/cql-drivers.html) for connection examples. The Node.js RS driver is built on a Rust core and provides shard-aware, fully asynchronous connections.
+Get started: https://nodejs-rs-driver.docs.scylladb.com/stable/getting-started/getting-started.html
+Best practices: https://nodejs-rs-driver.docs.scylladb.com/stable/statements/prepared.html
 
 **Vector search support**: All versions
 **Tablets support**: All versions
