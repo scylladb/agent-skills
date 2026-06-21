@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "scylladb-cloud": {
+      "type": "remote",
+      "url": "https://api.cloud.scylladb.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <PERSONAL_API_TOKEN>"
+      },
+      "timeout": 30000
+    }
+  }
+}

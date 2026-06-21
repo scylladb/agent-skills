@@ -1,0 +1,22 @@
+{
+  "name": "scylladb",
+  "version": "1.0.0",
+  "description": "Official Claude plugin for ScyllaDB (Skills). Connect to ScyllaDB Cloud, design CQL schemas, and implement Vector Search with expert guidance.",
+  "author": {
+    "name": "ScyllaDB",
+    "email": "support@scylladb.com",
+    "url": "https://www.scylladb.com"
+  },
+  "homepage": "https://www.scylladb.com/product/scylladb-cloud/",
+  "repository": "https://github.com/scylladb/agent-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "scylladb",
+    "database",
+    "nosql",
+    "cql",
+    "vector-search"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json"
+}
