@@ -14,6 +14,7 @@ npx skills add scylladb/agent-skills
 #### Install specific skills
 ```sh
 npx skills add scylladb/agent-skills --skill scylladb-cloud-setup
+npx skills add scylladb/agent-skills --skill scylladb-cloud-mcp
 npx skills add scylladb/agent-skills --skill scylladb-data-modeling
 npx skills add scylladb/agent-skills --skill scylladb-vector-search
 ```
@@ -44,6 +45,7 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 | Skill | Description |
 |-------|-------------|
 | [scylladb-cloud-setup](skills/scylladb-cloud-setup/SKILL.md) | Guide users through connecting to a ScyllaDB Cloud cluster — credentials, drivers, and connection verification. |
+| [scylladb-cloud-mcp](skills/scylladb-cloud-mcp/SKILL.md) | Set up and use the ScyllaDB Cloud MCP server to manage ScyllaDB Cloud clusters via AI agents. |
 | [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, and common pitfalls. |
 | [scylladb-vector-search](skills/scylladb-vector-search/SKILL.md) | Implement and optimize Vector Search on ScyllaDB Cloud — vector indexes, ANN queries, filtering, quantization, and driver integration. |
 
