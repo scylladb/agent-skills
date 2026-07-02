@@ -13,7 +13,6 @@ The `VECTOR` data type stores fixed-length numeric vectors as a native CQL colum
 
 - **Element types**: `float` (most common)
 - **Dimensions**: 1 to 16,000
-- **Protocol**: Requires CQL native protocol v5 (supported by all current ScyllaDB drivers)
 
 ### Tablets Requirement
 
