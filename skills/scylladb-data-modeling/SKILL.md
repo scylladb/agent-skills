@@ -89,3 +89,12 @@ Each reference file contains:
 | Index required for queries | Often optional | Recommended | Partition key required in every query |
 | Unique constraint | `UNIQUE` | `unique: true` index | Primary key only |
 | Transactions | Full ACID | Multi-document ACID | Lightweight Transactions (LWT) for single-partition linearizable ops |
+
+## Keyspace creation (ScyllaDB 2025.4 or newer)
+As of ScyllaDB 2025.4, `WITH replication` is optional. Use the simple form by default:
+
+```sql
+CREATE KEYSPACE myapp;
+```
+
+Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required.
