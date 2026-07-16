@@ -51,7 +51,7 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 | [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, and common pitfalls. |
 | [scylladb-vector-search](skills/scylladb-vector-search/SKILL.md) | Implement and optimize Vector Search on ScyllaDB Cloud — vector indexes, ANN queries, filtering, quantization, and driver integration. |
 | scylladb-alternator | Build against ScyllaDB's DynamoDB-compatible API — write isolation policies, load balancing (no single endpoint like real DynamoDB), authentication via CQL roles, and compatibility differences to know before porting a DynamoDB app. |
-| scylladb-kubernetes | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, and monitoring. |
+| [scylladb-kubernetes](skills/scylladb-kubernetes/SKILL.md) | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, client access & networking, TLS/mTLS & authentication, multi-datacenter, scaling, and monitoring/backup. |
 
 The skills follow the [Agent Skills format](https://agentskills.io).
 

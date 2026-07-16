@@ -37,3 +37,17 @@ sctool backup --name="hourly_backup" --cluster="<cluster>" \
 ```
 
 Object storage location (`s3:`, `gcs:`) needs to be reachable from the Manager Agent sidecars, this is a networking/credentials concern to confirm before assuming a backup schedule is actually working, a misconfigured location can fail silently until someone checks whether backups actually landed in the bucket.
+
+## Object Storage Setup Is a Prerequisite, Not an Afterthought
+
+Before `sctool backup` will work, the Manager Agent sidecars need both network reachability *and* credentials for the bucket, and how you supply credentials depends on the backend:
+
+- **AWS S3** — either static keys provided to the agent, or (preferably) an IAM role attached to the ScyllaDB node pool so no long-lived keys live in the cluster.
+- **GCS** — on GKE, Workload Identity is the clean path: bind the ScyllaDB pods' Kubernetes service account to a GCP service account that can write the bucket, rather than mounting a JSON key.
+- **MinIO** — a self-hosted, S3-compatible option useful for on-prem or for evaluating the backup path without a cloud account. It's addressed with an `s3:` location pointing at the MinIO endpoint plus its access/secret keys. (The example repo automates a MinIO deployment via `deployMinio.bash` for exactly this local-testing case.)
+
+Whichever backend, verify a backup actually lands (`sctool` task status plus an object listing in the bucket) rather than trusting that a scheduled task was created, credential/endpoint mistakes surface only at run time.
+
+## Restore Is Its Own Procedure
+
+Restore is not the inverse of `sctool backup` in one command, it's a deliberate multi-step operation and worth rehearsing before you need it. The shape of it: identify the snapshot to restore (from `sctool backup list` against the backup location), restore the schema, then restore the data into a cluster whose topology is compatible with the backup. ScyllaDB Manager drives this, and the Operator docs' "Restore from backup" guide is the authoritative step-by-step, don't improvise a restore from memory during an incident. The two things people get wrong: assuming restore auto-discovers the latest snapshot (you select it explicitly), and restoring into a topology that doesn't match what was backed up.
