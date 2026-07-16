@@ -17,6 +17,8 @@ npx skills add scylladb/agent-skills --skill scylladb-cloud-setup
 npx skills add scylladb/agent-skills --skill scylladb-cloud-mcp
 npx skills add scylladb/agent-skills --skill scylladb-data-modeling
 npx skills add scylladb/agent-skills --skill scylladb-vector-search
+npx skills add scylladb/agent-skills --skill scylladb-alternator
+npx skills add scylladb/agent-skills --skill scylladb-kubernetes
 ```
 
 ### Claude Code plugin
@@ -48,6 +50,8 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 | [scylladb-cloud-mcp](skills/scylladb-cloud-mcp/SKILL.md) | Set up and use the ScyllaDB Cloud MCP server to manage ScyllaDB Cloud clusters via AI agents. |
 | [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, and common pitfalls. |
 | [scylladb-vector-search](skills/scylladb-vector-search/SKILL.md) | Implement and optimize Vector Search on ScyllaDB Cloud — vector indexes, ANN queries, filtering, quantization, and driver integration. |
+| scylladb-alternator | Build against ScyllaDB's DynamoDB-compatible API — write isolation policies, load balancing (no single endpoint like real DynamoDB), authentication via CQL roles, and compatibility differences to know before porting a DynamoDB app. |
+| scylladb-kubernetes | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, and monitoring. |
 
 The skills follow the [Agent Skills format](https://agentskills.io).
 
