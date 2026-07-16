@@ -13,4 +13,4 @@
 .kiro/
 .opencode/
 
-.env
+.env.DS_Store

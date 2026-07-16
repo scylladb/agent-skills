@@ -1,7 +1,7 @@
 ---
-title: "Anti-Pattern: Large Partitions"
+title: Anti-Pattern: Large Partitions
 impact: CRITICAL
-impactDescription: "Causes OOM during compaction, slow reads, and uneven disk usage"
+impactDescription: Causes OOM during compaction, slow reads, and uneven disk usage
 tags: data-modeling, antipattern, large-partitions, unbounded-growth, compaction, OOM
 ---
 
@@ -18,7 +18,7 @@ tags: data-modeling, antipattern, large-partitions, unbounded-growth, compaction
 
 ### Incorrect: Unbounded Time-Series Partition
 
-```sql
+```
 -- WRONG: All readings for a sensor go into ONE partition forever
 CREATE TABLE sensor_readings (
     sensor_id text,
@@ -32,7 +32,7 @@ CREATE TABLE sensor_readings (
 
 ### Correct: Bucket by Time
 
-```sql
+```
 -- RIGHT: Add a time bucket to the partition key
 CREATE TABLE sensor_readings (
     sensor_id text,
@@ -50,7 +50,7 @@ See `pattern-bucketing.md` for detailed bucketing strategies.
 
 ### Incorrect: Unbounded User Activity
 
-```sql
+```
 -- WRONG: All activity for a user in one partition
 CREATE TABLE user_activity (
     user_id uuid,
@@ -65,7 +65,7 @@ CREATE TABLE user_activity (
 
 ### Correct: Bucket User Activity
 
-```sql
+```
 -- RIGHT: Bucket by month
 CREATE TABLE user_activity (
     user_id uuid,
@@ -79,16 +79,18 @@ CREATE TABLE user_activity (
 
 ### Sizing Rules of Thumb
 
-| Rows per Partition | Row Size | Partition Size | Risk |
-|-------------------|----------|----------------|------|
-| < 100,000 | < 1 KB | < 100 MB | ✅ Safe |
-| 100K – 1M | < 1 KB | 100 MB – 1 GB | ⚠️ Monitor |
-| > 1M | Any | > 1 GB | ❌ Redesign needed |
-| Any | > 10 KB | > 100 MB | ⚠️ Monitor |
+| Rows per Partition | Row Size | Partition Size | Risk              |
+| ------------------- | -------- | -------------- | ------------------ |
+| < 100,000           | < 1 KB   | < 100 MB       | Safe                |
+| 100K – 1M           | < 1 KB   | 100 MB – 1 GB  | Monitor             |
+| > 1M                | Any      | > 1 GB         | Redesign needed     |
+| Any                 | > 10 KB  | > 100 MB       | Monitor             |
+
+Note: 100 MB is a design target, not ScyllaDB's current system default. The scylla.yaml parameter that controls ScyllaDB's own large-partition warning, compaction_large_partition_warning_threshold_mb, currently defaults to 1000 MB. Designing to the stricter 100 MB target leaves headroom before the system's own warning would fire, and is a better guide for schema design than the configured default itself.
 
 ### How to Detect
 
-```bash
+```
 # Check partition size distribution
 nodetool tablehistograms <keyspace>.<table>
 # Look at "Partition Size" percentiles

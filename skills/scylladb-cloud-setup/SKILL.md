@@ -1,6 +1,6 @@
 ---
 name: scylladb-cloud-setup
-description: Guide users through connecting to a ScyllaDB Cloud cluster. Use this skill when a user needs to connect to ScyllaDB Cloud, configure driver credentials, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
+description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
 ---
 
 # ScyllaDB Cloud Connection Setup
@@ -27,6 +27,8 @@ Ask the user to confirm they have a ScyllaDB Cloud cluster. If not, direct them 
 5. (Recommended) Enable VPC Peering during cluster creation — it cannot be enabled later
 6. Click **Launch Cluster** and wait for provisioning
 
+Alternatively, for infrastructure-as-code workflows, clusters can be provisioned via the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) (`scylladbcloud_cluster` resource), which wraps the same [ScyllaDB Cloud REST API](https://cloud.docs.scylladb.com/stable/api-docs/) used by the Console. This is the better option to suggest when a user is scripting cluster creation rather than clicking through the UI once.
+
 ## Step 2: Retrieve Connection Credentials
 
 Guide the user to obtain credentials from the Cloud Console:
@@ -34,11 +36,11 @@ Guide the user to obtain credentials from the Cloud Console:
 1. Go to **My Clusters** → open the cluster
 2. Open the **Connect** tab
 3. Note the following:
-   - **Node addresses** (contact points) — e.g., `node-0.your-cluster.cloud.scylladb.com`
-   - **Port** — typically `9042`
-   - **Username** — default is `scylla`
-   - **Password** — shown on the Connect tab
-   - **Datacenter name** — e.g., `AWS_US_EAST_1`
+  - **Node addresses** (contact points) — e.g., `node-0.your-cluster.cloud.scylladb.com`
+  - **Port** — typically `9042`
+  - **Username** — default is `scylla`
+  - **Password** — shown on the Connect tab
+  - **Datacenter name** — e.g., `AWS_US_EAST_1`
 
 **Do not ask for or handle credentials directly** — guide the user to retrieve them from the Console and store them securely (environment variables, secrets manager, etc.).
 
@@ -46,15 +48,15 @@ Guide the user to obtain credentials from the Cloud Console:
 
 Ask the user which programming language they are using so you can recommend the correct ScyllaDB CQL driver:
 
-| Language | Driver | Package |
-|----------|--------|---------|
-| Python | scylla-driver | `pip install scylla-driver` |
-| Java | java-driver (4.x recommended) | Maven/Gradle dependency |
-| Go | gocql + gocqlx | `go get github.com/scylladb/gocql` |
-| Rust | scylla-rust-driver | `cargo add scylla` |
-| C# | scylla-csharp-driver | NuGet package |
-| C++ | cpp-rust-driver | Build from source or vcpkg |
-| Node.js | scylla-node-driver | `npm install @scylladb/driver` |
+| Language | Driver                                   | Package                                            |
+| -------- | ----------------------------------------- | --------------------------------------------------- |
+| Python   | scylla-driver                             | `pip install scylla-driver`                        |
+| Java     | java-driver (ScyllaDB's fork, 4.x line)   | `com.scylladb:java-driver-core:4.19.2.0` (Maven). Requires Java 11+ (Java 8 support was dropped as of this release). |
+| Go       | gocql + gocqlx                            | `go get github.com/scylladb/gocql`                 |
+| Rust     | scylla-rust-driver                        | `cargo add scylla`                                 |
+| C#       | scylla-csharp-driver                      | NuGet package                                      |
+| C++      | cpp-rust-driver                           | Build from source or vcpkg                         |
+| Node.js  | scylla-node-driver                        | `npm install @scylladb/driver`                     |
 
 ⚠️ **Important**: ScyllaDB has its own driver forks — do **not** use the DataStax/Cassandra drivers - unless there's no ScyllaDB driver available for your language. ScyllaDB drivers include shard-aware optimizations that route requests directly to the correct CPU core, improving throughput and latency.
 
@@ -90,6 +92,7 @@ Once connected, suggest relevant next steps:
 
 - **Data modeling**: Use the `scylladb-data-modeling` skill for schema design guidance
 - **Vector search**: Use the `scylladb-vector-search` skill if they need similarity search
-- **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing)
+- **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing). See `references/prepared-statements.md` for the full pattern with examples.
 - **Connection pooling**: ScyllaDB drivers handle pooling internally with shard-aware connections — typically no manual tuning needed
-- **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud cluster programmatically via an AI agent (create clusters, monitor health, configure networking, etc.), the ScyllaDB Cloud MCP server is available. See the full documentation at https://cloud.docs.scylladb.com/master/api-docs/mcp
+- **Infrastructure as code**: If the user wants to manage cluster provisioning declaratively (not just connect an app to an existing cluster), point them to the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) rather than only the manual Console flow in Step 1.
+- **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud cluster programmatically via an AI agent (create clusters, monitor health, configure networking, etc.), the ScyllaDB Cloud MCP server is available. See the full documentation at <https://cloud.docs.scylladb.com/master/api-docs/mcp>
