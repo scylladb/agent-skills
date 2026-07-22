@@ -1,7 +1,7 @@
 ---
-title: "Partition Key Design"
+title: Partition Key Design
 impact: CRITICAL
-impactDescription: "Determines data distribution, query capability, and cluster balance"
+impactDescription: Determines data distribution, query capability, and cluster balance
 tags: data-modeling, fundamentals, partition-key, composite-key, distribution, cardinality
 ---
 
@@ -20,7 +20,7 @@ tags: data-modeling, fundamentals, partition-key, composite-key, distribution, c
 
 A single column as the partition key:
 
-```sql
+```
 CREATE TABLE users (
     user_id uuid PRIMARY KEY,
     name text,
@@ -37,7 +37,7 @@ Best when: each entity is accessed individually by its ID.
 
 Multiple columns form the partition key (wrapped in extra parentheses):
 
-```sql
+```
 CREATE TABLE sensor_readings (
     sensor_id text,
     day date,
@@ -55,7 +55,7 @@ This is a **bucketing** pattern — each partition is bounded to one day's data 
 
 ### Incorrect: Low-Cardinality Partition Key
 
-```sql
+```
 -- WRONG: Only a few distinct values → hot partitions
 CREATE TABLE events (
     event_type text,
@@ -69,7 +69,7 @@ CREATE TABLE events (
 
 ### Correct: Add Cardinality
 
-```sql
+```
 -- RIGHT: Add a bucketing dimension for cardinality
 CREATE TABLE events (
     event_type text,
@@ -86,13 +86,13 @@ Trade-off: queries for a single `event_type` now require reading up to 100 parti
 
 ### Choosing the Right Partition Key
 
-| Access Pattern | Partition Key | Why |
-|---------------|--------------|-----|
-| Lookup by user | `user_id` | 1:1 mapping |
-| Messages in a conversation | `conversation_id` | All messages together |
-| Sensor data (time-series) | `(sensor_id, day)` | Bounded daily partitions |
-| Events by type (high volume) | `(event_type, bucket)` | Distribute high-volume types |
-| Multi-tenant SaaS | `(tenant_id, entity_id)` | Isolate tenants |
+| Access Pattern               | Partition Key            | Why                          |
+| ---------------------------- | ------------------------ | ----------------------------- |
+| Lookup by user               | `user_id`                | 1:1 mapping                   |
+| Messages in a conversation   | `conversation_id`        | All messages together         |
+| Sensor data (time-series)    | `(sensor_id, day)`       | Bounded daily partitions      |
+| Events by type (high volume) | `(event_type, bucket)`   | Distribute high-volume types  |
+| Multi-tenant SaaS            | `(tenant_id, entity_id)` | Isolate tenants                |
 
 ### Partition Size Guidelines
 
@@ -101,9 +101,11 @@ Trade-off: queries for a single `event_type` now require reading up to 100 parti
 - **Hard trouble**: > 1 GB — risk of OOM during compaction, query timeouts
 - Monitor with `nodetool tablehistograms <keyspace>.<table>` — check the partition size percentiles
 
+Note: 100 MB is a design target, not ScyllaDB's current system default. The scylla.yaml parameter that controls ScyllaDB's own large-partition warning, compaction_large_partition_warning_threshold_mb, currently defaults to 1000 MB. Designing to the stricter 100 MB target leaves headroom before the system's own warning would fire, and is a better guide for schema design than the configured default itself.
+
 ### Verify Partition Key Distribution
 
-```sql
+```
 -- Check the token distribution for a sample of rows
 SELECT token(partition_key_col), partition_key_col FROM my_table LIMIT 100;
 ```
