@@ -105,6 +105,6 @@ LIMIT 10;
 - `DISTINCT` keyword in ANN queries
 - `TOKEN` function in vector queries
 - `CONTAINS` operator in vector queries
-- Filtering on columns not in the primary key (see `filtering.md` for supported filtering)
+- Filtering on non-PK columns that aren't added to the index as filtering columns (see `filtering.md`)
 - `ALTER INDEX` (must drop and recreate to change index options)
 - TTL on columns with a vector index
