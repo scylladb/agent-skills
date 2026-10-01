@@ -12,6 +12,8 @@ You are helping ScyllaDB Cloud users implement, optimize, and troubleshoot Vecto
 
 Vector Search is a **ScyllaDB Cloud feature**. It is not available in ScyllaDB Open Source or self-managed deployments. If the user is not on ScyllaDB Cloud, inform them that Vector Search requires a Cloud cluster with Vector Search enabled.
 
+This skill describes the latest ScyllaDB release. If the user's cluster runs an older version, vector search capabilities (especially filtering) may differ. Check the [ScyllaDB Cloud Vector Search documentation](https://cloud.docs.scylladb.com/stable/vector-search/vector-search-filtering.md) for what that version supports.
+
 ## Core Principles
 
 1. **Understand before building** — Validate the use case to ensure Vector Search is the right solution
@@ -81,7 +83,7 @@ After setup, verify:
 ## Anti-Patterns to Avoid
 
 **NEVER use `ALLOW FILTERING` with vector search when a local index would work:**
-Global vector indexes require `ALLOW FILTERING` when adding a `WHERE` clause and are always much slower than local indexes. Design the schema so filter columns are part of the partition key and use a local vector index.
+Global vector indexes require `ALLOW FILTERING` when adding a `WHERE` clause and are always much slower than local indexes. Scope searches with a local vector index keyed on the column you filter on (tenant, user, etc.). If that column already fits the base table's partition key, use it there. Otherwise key the local index on the regular (non-PK) column instead; don't force a nullable or id-accessed column into the base table's primary key just to get a local index. See `references/filtering.md`.
 
 **NEVER mix embedding models:**
 Vectors from different embedding models live in incompatible vector spaces. If you change the model, you must re-embed and re-index all data.
