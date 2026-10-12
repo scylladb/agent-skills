@@ -1,20 +1,24 @@
 ---
 title: Anti-Pattern: Large Partitions
 impact: CRITICAL
-impactDescription: Causes OOM during compaction, slow reads, and uneven disk usage
-tags: data-modeling, antipattern, large-partitions, unbounded-growth, compaction, OOM
+impactDescription: Causes slow reads, slow repair and uneven shard load
+tags: data-modeling, antipattern, large-partitions, unbounded-growth, compaction, repair, hot-shard
 ---
 
 ## Anti-Pattern: Large Partitions
 
-**Partitions that grow without bounds are the second most common ScyllaDB performance issue.** When a partition exceeds ~100 MB, reads become slow, compaction requires more memory, and repair operations take longer. At ~1 GB+, you risk Out-Of-Memory (OOM) crashes during compaction because the entire partition must fit in memory.
+**Partitions that grow without bounds are the second most common ScyllaDB performance issue.** When a partition exceeds ~100 MB, reads of it get slower, repair and streaming become coarse-grained (a partition is the unit), and the single shard that owns it carries a disproportionate share of the table's load.
+
+Note on a common misconception: ScyllaDB does **not** need to hold a whole partition in memory during compaction or reads; it streams partitions row by row. Large partitions do not cause compaction OOMs in ScyllaDB the way they did in older Cassandra. The costs below are the real ones.
 
 ### Why It's Dangerous
 
-- **Memory during compaction** — ScyllaDB must hold the entire partition in memory during compaction. A 2 GB partition can cause OOM
-- **Slow reads** — reading a large partition requires scanning many SSTables and merging data in memory
-- **Slow repairs** — repair operates at the partition level; repairing one huge partition blocks other work
-- **Uneven disk usage** — a few massive partitions can fill one node's disk while others have space
+- **Slow reads** — a read must merge the partition's rows from several SSTables and the memtable; the more rows in one partition, the more work per read, and the row cache holds less of it
+- **Hot shard** — one partition lives on one shard per replica; a huge partition concentrates reads, writes and compaction on that shard while the rest of the node idles
+- **Coarse repair and streaming** — repair and tablet migration work in partition units; one huge partition is one indivisible unit of work
+- **Tombstone accumulation** — deletes and TTL expiry inside a large partition pile up tombstones that every read must skip until compaction removes them
+
+Automatic handling of oversized partitions is on the ScyllaDB roadmap; until it ships, bound partitions by design.
 
 ### Incorrect: Unbounded Time-Series Partition
 
@@ -27,7 +31,7 @@ CREATE TABLE sensor_readings (
     PRIMARY KEY (sensor_id, reading_time)
 );
 -- A sensor that reports every second generates 86,400 rows/day → 31.5M rows/year
--- Partition grows indefinitely → eventually OOM on compaction
+-- Partition grows indefinitely → ever slower reads, one hot shard
 ```
 
 ### Correct: Bucket by Time
@@ -46,7 +50,7 @@ CREATE TABLE sensor_readings (
 -- Predictable, bounded partition size
 ```
 
-See `pattern-bucketing.md` for detailed bucketing strategies.
+See `pattern-bucketing.md` for detailed bucketing strategies. For time series, pair bucketing with TTL and `TimeWindowCompactionStrategy` (see the `scylladb-features` skill, compaction reference).
 
 ### Incorrect: Unbounded User Activity
 
@@ -99,10 +103,13 @@ nodetool tablehistograms <keyspace>.<table>
 # Check for large partitions in logs
 grep "large_partition" /var/log/syslog
 # ScyllaDB logs warnings when partitions exceed the configured threshold
+
+# In ScyllaDB Monitoring: a single shard with much higher load than its peers
+# on the same node is the signature of a large or hot partition
 ```
 
 ### When Large Partitions Are Acceptable
 
 - **Static or slowly growing data** — e.g., a `users` table where each user has a bounded number of attributes
 - **Known bounded cardinality** — e.g., a maximum of 50 items per order, enforced by application logic
-- **Read-rarely data** — if the partition is large but almost never read, the compaction cost may be tolerable
+- **Read-rarely data** — if the partition is large but almost never read, the cost may be tolerable
