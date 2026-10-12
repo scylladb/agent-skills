@@ -1,6 +1,6 @@
 ---
 name: scylladb-data-modeling
-description: ScyllaDB CQL data modeling patterns and anti-patterns. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, or troubleshooting performance issues caused by schema problems. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size".
+description: ScyllaDB CQL data modeling patterns and anti-patterns. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, or troubleshooting performance issues caused by schema problems. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size", "slow queries", "timeouts on one node", "one shard is hot".
 ---
 
 # ScyllaDB Data Modeling
@@ -21,6 +21,8 @@ Reference these guidelines when:
 - Encountering `ALLOW FILTERING` in queries or code reviews
 - Adding secondary indexes or materialized views
 
+For features beyond the schema — workload isolation, CDC, rate limits, compaction strategy, consistency — go to the `scylladb-features` skill after the model is right.
+
 ## Key Principle
 
 > **"Start from the queries, not from the entities."**
@@ -31,15 +33,15 @@ This is ScyllaDB's core data modeling philosophy. Unlike relational databases wh
 2. **Design one table per query pattern** — each table's primary key is crafted to serve a specific query efficiently
 3. **Accept denormalization** — the same data may exist in multiple tables, each optimized for a different access pattern
 
-In ScyllaDB, the partition key determines **which node** holds the data and the clustering columns determine **the sort order within** that partition. The primary key IS your access pattern.
+In ScyllaDB, the partition key determines **which node and shard** hold the data and the clustering columns determine **the sort order within** that partition. The primary key IS your access pattern.
 
 ## Quick Reference
 
 ### 1. Anti-Patterns — 5 rules
 
 - [antipattern-allow-filtering](references/antipattern-allow-filtering.md) — `ALLOW FILTERING` forces a full-scan. Consult this reference whenever you see it in a query, or when a query does not include the full partition key.
-- [antipattern-large-partitions](references/antipattern-large-partitions.md) — Partitions that grow without bounds cause memory pressure, slow reads, and compaction issues. Consult when designing time-series tables or any table where rows accumulate per partition key.
-- [antipattern-hot-partitions](references/antipattern-hot-partitions.md) — Uneven partition key distribution causes some nodes/shards to be overloaded while others sit idle. Consult when choosing partition keys for high-write workloads.
+- [antipattern-large-partitions](references/antipattern-large-partitions.md) — Partitions that grow without bounds cause slow reads, coarse repair, and a hot shard. Consult when designing time-series tables or any table where rows accumulate per partition key.
+- [antipattern-hot-partitions](references/antipattern-hot-partitions.md) — Uneven partition key distribution causes some shards to be overloaded while others sit idle. Consult when choosing partition keys for high-write workloads. For the immediate production fix (per-partition rate limit) see `scylladb-features`.
 - [antipattern-unpaged-queries](references/antipattern-unpaged-queries.md) — Unpaged SELECTs cause unbounded memory growth and cluster instability. Consult when a query may return more rows than a single page, or when reviewing code that calls raw/unpaged execution methods.
 - [antipattern-multi-partition-batch](references/antipattern-multi-partition-batch.md) — BATCH statements spanning multiple partitions provide no real atomicity benefit and create coordinator hotspots. Consult when reviewing code that uses BATCH to simulate a transaction, or when migrating SQL transaction logic to CQL.
 
@@ -91,8 +93,9 @@ Each reference file contains:
 | Joins                      | `JOIN` clause            | `$lookup` aggregation    | Not supported — denormalize instead                                  |
 | Flexible schema            | No (strict DDL)          | Yes (schema-optional)    | No (strict CQL DDL)                                                  |
 | Index required for queries | Often optional           | Recommended              | Partition key required in every query                                |
-| Unique constraint          | `UNIQUE`                 | `unique: true` index     | Primary key only                                                     |
-| Transactions               | Full ACID                | Multi-document ACID      | Lightweight Transactions (LWT) for single-partition linearizable ops |
+| Unique constraint          | `UNIQUE`                 | `unique: true` index     | Primary key only; `INSERT ... IF NOT EXISTS` (LWT) for uniqueness checks |
+| Transactions               | Full ACID                | Multi-document ACID      | Lightweight Transactions (LWT) for single-partition linearizable ops; strongly consistent tables on the roadmap |
+| Aggregates                 | `COUNT`, `SUM`, `GROUP BY` | Aggregation pipeline   | `COUNT`/`SUM`/`AVG`/`MIN`/`MAX` pushed down to all shards; no `GROUP BY` across partitions |
 
 ## Keyspace creation (ScyllaDB 2025.4 or newer)
 
@@ -102,4 +105,9 @@ As of ScyllaDB 2025.4, `WITH replication` is optional. Use the simple form by de
 CREATE KEYSPACE myapp;
 ```
 
-Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required.
+Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required. New keyspaces use **tablets** by default: data is placed in ~5 GB units managed by Raft rather than by the token ring, which is what makes scaling elastic. Two consequences for schema work:
+
+- `SimpleStrategy` is not supported with tablets; always use `NetworkTopologyStrategy` (or the default).
+- Small tables stay small (a few tablets), so a lookup table is not fragmented across hundreds of ranges; there is no need to avoid small tables.
+
+See the `scylladb-features` skill, `tablets-and-raft.md`, for what else tablets change.
