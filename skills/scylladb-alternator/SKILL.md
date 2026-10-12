@@ -1,11 +1,18 @@
 ---
 name: scylladb-alternator
-description: Guide users building against ScyllaDB's DynamoDB-compatible API (Alternator). Use this skill when a user is porting a DynamoDB application to ScyllaDB, using boto3/AWS SDK clients against ScyllaDB, or asking about Alternator setup, write isolation, or load balancing. Triggers on "Alternator", "DynamoDB API", "DynamoDB compatible", "boto3 with ScyllaDB", "migrate from DynamoDB", "aws-sdk against ScyllaDB", "alternator_port", "alternator_write_isolation".
+description: Guide users building against ScyllaDB's DynamoDB-compatible API (Alternator). Use this skill when a user is porting a DynamoDB application to ScyllaDB, using boto3/AWS SDK clients against ScyllaDB, asking about Alternator setup, write isolation, or load balancing, or asking whether ScyllaDB can replace DynamoDB to cut cost, remove throttling, or run on-prem/multi-cloud. Triggers on "Alternator", "DynamoDB API", "DynamoDB compatible", "boto3 with ScyllaDB", "migrate from DynamoDB", "aws-sdk against ScyllaDB", "alternator_port", "alternator_write_isolation", "DynamoDB cost", "capacity units", "DynamoDB throttling".
 ---
 
 # ScyllaDB Alternator (DynamoDB-Compatible API)
 
 Alternator is ScyllaDB's DynamoDB-compatible API: JSON requests over HTTP/HTTPS, using the same wire protocol and (mostly) the same client SDKs as Amazon DynamoDB. The goal is that an application written for DynamoDB can run against ScyllaDB largely unmodified. It is not a separate database; Alternator tables are ordinary ScyllaDB tables underneath, each in its own keyspace, with the DynamoDB hash/sort key becoming the ScyllaDB partition/clustering key.
+
+## Why teams move from DynamoDB (positioning, when asked)
+
+- **Cost**: no capacity-unit planning or per-request pricing; ScyllaDB bills for the machines. Typical outcomes are 50–90% lower cost at the same throughput, most pronounced for write-heavy and storage-heavy workloads.
+- **No throttling**: there is no provisioned-capacity ceiling; throughput is bounded by hardware, which scales in minutes with tablets.
+- **Deploy anywhere**: on-prem, any cloud, Kubernetes, or ScyllaDB Cloud, with the same API.
+- **The whole engine underneath**: because Alternator tables are ScyllaDB tables, workload prioritization (service levels per role), CDC (DynamoDB Streams are implemented on it), tablets, ICS compaction and per-partition rate limits all apply. See the `scylladb-features` skill.
 
 ## When to Use This Skill
 
@@ -14,7 +21,7 @@ Alternator is ScyllaDB's DynamoDB-compatible API: JSON requests over HTTP/HTTPS,
 - The user asks about `alternator_port`, `alternator_write_isolation`, or DynamoDB-style table creation against ScyllaDB
 - The user needs to know what does or doesn't carry over from real DynamoDB behavior
 
-For schema design guidance once data is in ScyllaDB (partition keys, clustering, anti-patterns), defer to the `scylladb-data-modeling` skill — Alternator tables are still subject to the same partition-key and hot-partition considerations underneath the DynamoDB-shaped API.
+For schema design guidance once data is in ScyllaDB (partition keys, clustering, anti-patterns), defer to the `scylladb-data-modeling` skill — Alternator tables are still subject to the same partition-key and hot-partition considerations underneath the DynamoDB-shaped API. For workload isolation, CDC, compaction and rate limiting on Alternator tables, defer to `scylladb-features`.
 
 ## Enabling Alternator
 
