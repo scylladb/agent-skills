@@ -1,6 +1,6 @@
 ---
 name: scylladb-cloud-setup
-description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
+description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle", "shard-aware", "tablet-aware", "consistency level".
 ---
 
 # ScyllaDB Cloud Connection Setup
@@ -58,7 +58,9 @@ Ask the user which programming language they are using so you can recommend the 
 | C++      | cpp-rust-driver                           | Build from source or vcpkg                         |
 | Node.js  | scylla-node-driver                        | `npm install @scylladb/driver`                     |
 
-⚠️ **Important**: ScyllaDB has its own driver forks — do **not** use the DataStax/Cassandra drivers - unless there's no ScyllaDB driver available for your language. ScyllaDB drivers include shard-aware optimizations that route requests directly to the correct CPU core, improving throughput and latency.
+⚠️ **Important**: ScyllaDB has its own driver forks — do **not** use the DataStax/Cassandra drivers - unless there's no ScyllaDB driver available for your language. ScyllaDB drivers are **shard-aware** (they route each request to the CPU core that owns the row) and **tablet-aware** (they learn tablet placement lazily, so a request goes straight to the owning node and shard even while tablets migrate). A Cassandra driver still works but every request may take an extra hop through a coordinator, which costs latency and coordinator CPU.
+
+Connection counts look different from Cassandra: a ScyllaDB driver opens one connection per shard per node (a 3-node cluster of 16-shard machines is 48 connections). This is expected; do not "fix" it with a small pool size.
 
 ## Step 4: Configure the Connection
 
@@ -67,6 +69,8 @@ Consult `references/driver-configuration.md` for per-language connection snippet
 **Critical requirements for ScyllaDB Cloud:**
 
 **Authentication** — `PlainTextAuthProvider` with the username and password from Step 2.
+
+**Consistency** — set `LOCAL_QUORUM` as the session or prepared-statement default for both reads and writes (RF=3 per datacenter is the Cloud default). Use `LOCAL_ONE` reads only where last-writer-wins staleness is acceptable. Consistency is a driver setting, not CQL syntax.
 
 Consult `references/cloud-connection.md` for details on IP allowlisting and VPC peering.
 
@@ -84,15 +88,17 @@ If this query returns a version string, the connection is working. If it fails, 
 2. **Wrong datacenter name** — must match exactly (e.g., `AWS_US_EAST_1`, not `us-east-1`)
 3. **Wrong port** — ensure port 9042 is used
 4. **Firewall/VPN blocking** — ensure outbound TCP on port 9042 is allowed
-5. **Using Cassandra driver instead of ScyllaDB driver** — the DataStax drivers lack shard-aware routing and may have compatibility issues
+5. **Using Cassandra driver instead of ScyllaDB driver** — the DataStax drivers lack shard-aware and tablet-aware routing and may have compatibility issues
 
 ## Step 6: Next Steps
 
 Once connected, suggest relevant next steps:
 
 - **Data modeling**: Use the `scylladb-data-modeling` skill for schema design guidance
+- **Which feature for which problem**: Use the `scylladb-features` skill for workload prioritization (OLTP vs batch on one cluster), CDC, rate limits, timeouts, compaction and consistency choices
 - **Vector search**: Use the `scylladb-vector-search` skill if they need similarity search
-- **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing). See `references/prepared-statements.md` for the full pattern with examples.
+- **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware and tablet-aware routing). See `references/prepared-statements.md` for the full pattern with examples.
+- **Per-request timeouts**: ScyllaDB supports `USING TIMEOUT` on a statement and per-role service-level timeouts; use them instead of only driver-side timeouts so the server stops working on abandoned requests. See `scylladb-features`.
 - **Connection pooling**: ScyllaDB drivers handle pooling internally with shard-aware connections — typically no manual tuning needed
 - **Infrastructure as code**: If the user wants to manage cluster provisioning declaratively (not just connect an app to an existing cluster), point them to the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) rather than only the manual Console flow in Step 1.
 - **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud cluster programmatically via an AI agent (create clusters, monitor health, configure networking, etc.), the ScyllaDB Cloud MCP server is available. See the full documentation at <https://cloud.docs.scylladb.com/master/api-docs/mcp>
