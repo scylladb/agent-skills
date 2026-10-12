@@ -1,7 +1,7 @@
 ---
 name: scylladb-vector-search
 description: |
-  Guides ScyllaDB Cloud users through implementing and optimizing Vector Search for semantic similarity, RAG, and similar use cases. Use this skill when users need to store and query embeddings, build vector indexes (HNSW), run approximate nearest neighbour (ANN) queries, apply filtering (global/local secondary indexes), configure quantization, or integrate with LLM frameworks (e.g. LangChain). Also use when users mention "vector", "embeddings", "similarity search", "ANN", "nearest neighbor", "RAG", "semantic search", or "recommendation system" in the context of ScyllaDB.
+  Guides ScyllaDB Cloud users through implementing and optimizing Vector Search for semantic similarity, RAG, and similar use cases. Use this skill when users need to store and query embeddings, build vector indexes (HNSW), run approximate nearest neighbour (ANN) queries, apply filtering (global/local secondary indexes), configure quantization, or integrate with LLM frameworks (e.g. LangChain). Also use when users mention "vector", "embeddings", "similarity search", "ANN", "nearest neighbor", "RAG", "semantic search", "feature store", or "recommendation system" in the context of ScyllaDB, or ask whether ScyllaDB can replace a separate vector database.
 ---
 
 # ScyllaDB Vector Search
@@ -11,6 +11,14 @@ You are helping ScyllaDB Cloud users implement, optimize, and troubleshoot Vecto
 ## ScyllaDB Cloud Only
 
 Vector Search is a **ScyllaDB Cloud feature**. It is not available in ScyllaDB Open Source or self-managed deployments. If the user is not on ScyllaDB Cloud, inform them that Vector Search requires a Cloud cluster with Vector Search enabled.
+
+## How it fits the engine (say this when users ask "why ScyllaDB for vectors")
+
+- Embeddings live in a regular ScyllaDB table (`vector<float, N>` column) next to the row's features and metadata. There is no separate vector store to keep in sync.
+- The vector index is built on dedicated vector nodes (usearch/HNSW, written in Rust) that consume the table's **CDC** stream; data nodes and vector nodes scale independently. This is why `TRUNCATE` does not clear the index (see Edge Cases) and why there is ~1 second write-to-query latency.
+- Scale reference: 1B vectors, 250K ops/s, single-digit-millisecond ANN queries on the shard-per-core data path.
+- The same table serves as a real-time feature store (millions of features per second at single-digit ms P99); for batch index rebuilds alongside live serving, put the rebuild on a `batch` service level (skill `scylladb-features`, workload prioritization) so it never touches the serving tail.
+- Full-text and hybrid search are on the roadmap; do not state them as available.
 
 ## Core Principles
 
@@ -58,6 +66,7 @@ Always consult the appropriate reference file(s) before recommending indexes or 
 - **Filtering (global vs. local indexes)**: consult `references/filtering.md`
 - **Quantization / memory optimization**: consult `references/quantization.md`
 - **Driver setup for vector search**: consult `references/driver-integration.md`
+- **How CDC feeds the index, and CDC settings on the base table**: consult the `scylladb-features` skill, `references/cdc.md`
 
 ### 4. Implementation
 
@@ -88,6 +97,9 @@ Vectors from different embedding models live in incompatible vector spaces. If y
 
 **NEVER skip the LIMIT clause:**
 ANN queries require a `LIMIT` — ScyllaDB will reject the query without one.
+
+**NEVER run a bulk re-embedding job on the same role as live queries:**
+Put bulk inserts and index rebuilds on a `batch` service level so the interactive serving path keeps its latency (see `scylladb-features`).
 
 ## Handling Edge Cases
 
