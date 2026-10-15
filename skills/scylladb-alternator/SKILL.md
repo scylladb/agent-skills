@@ -1,6 +1,6 @@
 ---
 name: scylladb-alternator
-description: Guide users building against ScyllaDB's DynamoDB-compatible API (Alternator). Use this skill when a user is porting a DynamoDB application to ScyllaDB, using boto3/AWS SDK clients against ScyllaDB, or asking about Alternator setup, write isolation, or load balancing. Triggers on "Alternator", "DynamoDB API", "DynamoDB compatible", "boto3 with ScyllaDB", "migrate from DynamoDB", "aws-sdk against ScyllaDB", "alternator_port", "alternator_write_isolation".
+description: Guide users building against ScyllaDB's DynamoDB-compatible API (Alternator). Use this skill when a user is porting a DynamoDB application to ScyllaDB, using boto3/AWS SDK clients against ScyllaDB, or asking about Alternator setup, write isolation, or load balancing. CQL schema design goes to scylladb-data-modeling. Triggers on "Alternator", "DynamoDB API", "DynamoDB compatible", "boto3 with ScyllaDB", "migrate from DynamoDB", "aws-sdk against ScyllaDB", "alternator_port", "alternator_write_isolation".
 ---
 
 # ScyllaDB Alternator (DynamoDB-Compatible API)

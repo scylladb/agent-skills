@@ -1,6 +1,6 @@
 ---
 name: scylladb-cloud-setup
-description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, or troubleshoot connection issues. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
+description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, or troubleshoot connection issues. Cluster management through an AI agent goes to scylladb-cloud-mcp. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle".
 ---
 
 # ScyllaDB Cloud Connection Setup

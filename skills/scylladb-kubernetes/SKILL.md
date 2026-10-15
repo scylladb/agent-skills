@@ -1,6 +1,6 @@
 ---
 name: scylladb-kubernetes
-description: Guide users deploying and operating ScyllaDB on Kubernetes via the official ScyllaDB Operator. Use this skill when a user is setting up a ScyllaCluster, configuring node storage/CPU pinning for ScyllaDB pods, installing the Operator, or troubleshooting a Kubernetes-based ScyllaDB deployment. Triggers on "ScyllaDB Operator", "ScyllaCluster", "scylla-operator", "ScyllaDB on Kubernetes", "ScyllaDB Helm chart", "NodeConfig", "ScyllaDB EKS", "ScyllaDB GKE", "ScyllaDB OKE", "ScyllaDB kubernetes deployment", "exposeOptions", "ScyllaCluster TLS/mTLS", "ScyllaDB Manager backup/restore on Kubernetes", "multi-datacenter ScyllaDB", "externalSeeds".
+description: Guide users deploying and operating ScyllaDB on Kubernetes via the official ScyllaDB Operator. Use this skill when a user is setting up a ScyllaCluster, configuring node storage/CPU pinning for ScyllaDB pods, installing the Operator, or troubleshooting a Kubernetes-based ScyllaDB deployment. Managed ScyllaDB Cloud clusters go to scylladb-cloud-setup. Triggers on "ScyllaDB Operator", "ScyllaCluster", "scylla-operator", "ScyllaDB on Kubernetes", "ScyllaDB Helm chart", "NodeConfig", "ScyllaDB EKS", "ScyllaDB GKE", "ScyllaDB OKE", "ScyllaDB kubernetes deployment", "exposeOptions", "ScyllaCluster TLS/mTLS", "ScyllaDB Manager backup/restore on Kubernetes", "multi-datacenter ScyllaDB", "externalSeeds".
 ---
 
 # ScyllaDB on Kubernetes (ScyllaDB Operator)
