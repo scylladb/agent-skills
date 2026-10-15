@@ -66,7 +66,7 @@ for row in rows:
 
 ### Javascript (Node.js RS Driver)
 
-Refer to the [Node.js RS Driver documentation](https://nodejs-rs-driver.docs.scylladb.com/stable/).
+Refer to the [Node.js RS Driver documentation](https://nodejs-rs-driver.docs.scylladb.com/stable/index.md).
 
 ### Java (4.x)
 

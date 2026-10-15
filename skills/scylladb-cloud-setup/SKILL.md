@@ -27,7 +27,7 @@ Ask the user to confirm they have a ScyllaDB Cloud cluster. If not, direct them 
 5. (Recommended) Enable VPC Peering during cluster creation — it cannot be enabled later
 6. Click **Launch Cluster** and wait for provisioning
 
-Alternatively, for infrastructure-as-code workflows, clusters can be provisioned via the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) (`scylladbcloud_cluster` resource), which wraps the same [ScyllaDB Cloud REST API](https://cloud.docs.scylladb.com/stable/api-docs/) used by the Console. This is the better option to suggest when a user is scripting cluster creation rather than clicking through the UI once.
+Alternatively, for infrastructure-as-code workflows, clusters can be provisioned via the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) (`scylladbcloud_cluster` resource), which wraps the same [ScyllaDB Cloud REST API](https://cloud.docs.scylladb.com/stable/api-docs/index.md) used by the Console. This is the better option to suggest when a user is scripting cluster creation rather than clicking through the UI once.
 
 ## Step 2: Retrieve Connection Credentials
 
