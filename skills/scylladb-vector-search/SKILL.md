@@ -97,7 +97,7 @@ ANN queries require a `LIMIT` — ScyllaDB will reject the query without one.
 
 **User's cluster doesn't have Vector Search enabled:**
 - Direct them to the ScyllaDB Cloud UI → cluster settings → enable Vector Search
-- See [Vector Search Deployments](https://cloud.docs.scylladb.com/stable/vector-search/vector-search-clusters.html) for setup
+- See [Vector Search Deployments](https://cloud.docs.scylladb.com/stable/vector-search/vector-search-clusters.md) for setup
 
 **Query returns no results:**
 - Check write-to-query latency (~1 second delay after insert)

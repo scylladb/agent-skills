@@ -1,19 +1,19 @@
 ---
 title: Anti-Pattern: Large Partitions
 impact: CRITICAL
-impactDescription: Causes OOM during compaction, slow reads, and uneven disk usage
-tags: data-modeling, antipattern, large-partitions, unbounded-growth, compaction, OOM
+impactDescription: Causes hot shards, slow reads, slow repair and streaming, and uneven disk usage
+tags: data-modeling, antipattern, large-partitions, unbounded-growth, compaction, hot-shard
 ---
 
 ## Anti-Pattern: Large Partitions
 
-**Partitions that grow without bounds are the second most common ScyllaDB performance issue.** When a partition exceeds ~100 MB, reads become slow, compaction requires more memory, and repair operations take longer. At ~1 GB+, you risk Out-Of-Memory (OOM) crashes during compaction because the entire partition must fit in memory.
+**Partitions that grow without bounds are the second most common ScyllaDB performance issue.** When a partition exceeds ~100 MB, reads become slow, one shard does a disproportionate share of the work, and repair operations take longer.
 
 ### Why It's Dangerous
 
-- **Memory during compaction** — ScyllaDB must hold the entire partition in memory during compaction. A 2 GB partition can cause OOM
+- **Hot shard** — a partition is owned by a single shard on each replica, and a single partition cannot be split across tablets. All reads, writes, and compaction work for it land on one CPU core per replica
 - **Slow reads** — reading a large partition requires scanning many SSTables and merging data in memory
-- **Slow repairs** — repair operates at the partition level; repairing one huge partition blocks other work
+- **Slow repair and streaming** — all rows of the partition are compared and transferred by the same shard, so one huge partition dominates repair, bootstrap, and tablet migration time
 - **Uneven disk usage** — a few massive partitions can fill one node's disk while others have space
 
 ### Incorrect: Unbounded Time-Series Partition
@@ -27,7 +27,7 @@ CREATE TABLE sensor_readings (
     PRIMARY KEY (sensor_id, reading_time)
 );
 -- A sensor that reports every second generates 86,400 rows/day → 31.5M rows/year
--- Partition grows indefinitely → eventually OOM on compaction
+-- Partition grows indefinitely
 ```
 
 ### Correct: Bucket by Time

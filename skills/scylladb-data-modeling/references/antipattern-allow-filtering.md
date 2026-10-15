@@ -84,7 +84,11 @@ CREATE TABLE in_stock_products_by_category (
 -- Query: WHERE category = 'Electronics' AND in_stock = true
 ```
 
-**Option B: Use a secondary index** (acceptable if filter column has moderate cardinality and queries always include the partition key — see `secondary-indexes-and-mv.md`)
+**Option B: Use a local secondary index** (acceptable because the query always includes the partition key — see `secondary-indexes-and-mv.md`)
+```sql
+CREATE INDEX ON products ((category), in_stock);
+-- Query: WHERE category = 'Electronics' AND in_stock = true
+```
 
 ### When ALLOW FILTERING Is Acceptable
 

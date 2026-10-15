@@ -50,7 +50,7 @@ Maven dependency:
 <dependency>
     <groupId>com.scylladb</groupId>
     <artifactId>java-driver-core</artifactId>
-    <version>4.19.0</version>
+    <version>4.19.2.2</version>
 </dependency>
 ```
 
@@ -69,7 +69,7 @@ session.execute("SELECT release_version FROM system.local")
     .getString("release_version");
 ```
 
-**Minimum version for vector search**: 4.16.0 (recommended 4.19.0+)
+**Minimum version for vector search**: 4.16.0 (recommended: the latest 4.x release)
 **Minimum version for tablets**: 4.18.0
 
 ---
@@ -127,21 +127,36 @@ tokio = { version = "1", features = ["full"] }
 ```
 
 ```rust
-use scylla::{SessionBuilder, transport::Compression};
+use scylla::client::execution_profile::ExecutionProfile;
+use scylla::client::session::Session;
+use scylla::client::session_builder::SessionBuilder;
+use scylla::policies::load_balancing::DefaultPolicy;
 use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let session = SessionBuilder::new()
+    let policy = DefaultPolicy::builder()
+        .prefer_datacenter("AWS_US_EAST_1".to_string())
+        .token_aware(true)
+        .permit_dc_failover(false)
+        .build();
+    let profile = ExecutionProfile::builder()
+        .load_balancing_policy(policy)
+        .build();
+
+    let session: Session = SessionBuilder::new()
         .known_node("node-0.your-cluster.cloud.scylladb.com:9042")
         .user("scylla", "YOUR_PASSWORD")
+        .default_execution_profile_handle(profile.into_handle())
         .build()
         .await?;
 
-    let result = session
+    let (version,) = session
         .query_unpaged("SELECT release_version FROM system.local", &[])
-        .await?;
-    println!("Connected to ScyllaDB");
+        .await?
+        .into_rows_result()?
+        .single_row::<(String,)>()?;
+    println!("Connected to ScyllaDB {version}");
     Ok(())
 }
 ```
@@ -185,8 +200,8 @@ A client-side driver for ScyllaDB written in Node.js and Rust.
 npm install @scylladb/driver
 ```
 
-Get started: https://nodejs-rs-driver.docs.scylladb.com/stable/getting-started/getting-started.html
-Best practices: https://nodejs-rs-driver.docs.scylladb.com/stable/statements/prepared.html
+Get started: https://nodejs-rs-driver.docs.scylladb.com/stable/getting-started/getting-started.md
+Best practices: https://nodejs-rs-driver.docs.scylladb.com/stable/statements/prepared.md
 
 **Vector search support**: All versions
 **Tablets support**: All versions
@@ -195,7 +210,7 @@ Best practices: https://nodejs-rs-driver.docs.scylladb.com/stable/statements/pre
 
 ## CPP RS (`cpp-rust-driver`)
 
-Refer to the [CPP RS Driver documentation](https://docs.scylladb.com/stable/drivers/cql-drivers.html) for connection examples. Built on a Rust core for memory safety with C++ usability.
+Refer to the [CPP RS Driver documentation](https://docs.scylladb.com/stable/drivers/cql-drivers.md) for connection examples. Built on a Rust core for memory safety with C++ usability.
 
 **Vector search support**: 0.5.1+
 **Tablets support**: All versions

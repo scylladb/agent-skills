@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS myapp.documents (
 );
 ```
 
-**Note**: The example above uses 768 dimensions matching `all-MiniLM-L6-v2`. In production, set dimensions to match your embedding model's output exactly.
+**Note**: The example above uses 768 dimensions matching `all-mpnet-base-v2`. In production, set dimensions to match your embedding model's output exactly.
 
 ## Vector Index
 

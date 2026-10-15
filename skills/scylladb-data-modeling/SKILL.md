@@ -38,7 +38,7 @@ In ScyllaDB, the partition key determines **which node** holds the data and the 
 ### 1. Anti-Patterns — 5 rules
 
 - [antipattern-allow-filtering](references/antipattern-allow-filtering.md) — `ALLOW FILTERING` forces a full-scan. Consult this reference whenever you see it in a query, or when a query does not include the full partition key.
-- [antipattern-large-partitions](references/antipattern-large-partitions.md) — Partitions that grow without bounds cause memory pressure, slow reads, and compaction issues. Consult when designing time-series tables or any table where rows accumulate per partition key.
+- [antipattern-large-partitions](references/antipattern-large-partitions.md) — Partitions that grow without bounds cause hot shards, slow reads, and slow repair and streaming. Consult when designing time-series tables or any table where rows accumulate per partition key.
 - [antipattern-hot-partitions](references/antipattern-hot-partitions.md) — Uneven partition key distribution causes some nodes/shards to be overloaded while others sit idle. Consult when choosing partition keys for high-write workloads.
 - [antipattern-unpaged-queries](references/antipattern-unpaged-queries.md) — Unpaged SELECTs cause unbounded memory growth and cluster instability. Consult when a query may return more rows than a single page, or when reviewing code that calls raw/unpaged execution methods.
 - [antipattern-multi-partition-batch](references/antipattern-multi-partition-batch.md) — BATCH statements spanning multiple partitions provide no real atomicity benefit and create coordinator hotspots. Consult when reviewing code that uses BATCH to simulate a transaction, or when migrating SQL transaction logic to CQL.
@@ -103,3 +103,14 @@ CREATE KEYSPACE myapp;
 ```
 
 Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required.
+
+New keyspaces use tablets by default (controlled by `tablets_mode_for_new_keyspaces`). Check the ScyllaDB version before using these features in a tablets keyspace:
+
+- **Materialized views and secondary indexes**: supported on tablets as of ScyllaDB 2025.4. The keyspace must stay [RF-rack-valid](https://docs.scylladb.com/manual/stable/architecture/tablets.md) for its whole lifetime.
+- **Counters**: supported on tablets as of ScyllaDB 2026.1. On older versions, put counter tables in a vnodes keyspace:
+
+```
+CREATE KEYSPACE myapp_counters
+  WITH replication = {'class': 'NetworkTopologyStrategy', 'replication_factor': 3}
+  AND tablets = {'enabled': false};
+```

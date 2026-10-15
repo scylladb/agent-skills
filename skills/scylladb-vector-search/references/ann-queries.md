@@ -84,9 +84,7 @@ results = [row for row in rows if row.score >= 0.7]
 
 ### Pagination
 
-ANN queries do not support CQL paging (no `OFFSET`). For pagination:
-1. Use a larger `LIMIT` and paginate application-side
-2. Or use the similarity score from the last result as a filter threshold
+ANN queries do not support CQL paging (no `OFFSET`). To paginate, fetch with a `LIMIT` large enough for the pages you need (for example, `LIMIT 50` for 5 pages of 10) and slice the results in the application. For the next page beyond that, re-run the query with a larger `LIMIT` and skip the rows already shown.
 
 ### Combining with Non-Vector Columns
 

@@ -34,7 +34,7 @@ VPC Peering routes traffic over a private network instead of the public internet
 - Must be enabled **at cluster creation time** — cannot be added later
 - Eliminates the need for IP allowlisting
 - Supports AWS VPC Peering and GCP VPC Peering
-- Configuration guides: [AWS](https://cloud.docs.scylladb.com/stable/cluster-connections/aws-vpc-peering.html) | [GCP](https://cloud.docs.scylladb.com/stable/cluster-connections/gcp-vpc-peering.html)
+- Configuration guides: [AWS](https://cloud.docs.scylladb.com/stable/cluster-connections/vpc-peering/aws-vpc-peering.md) | [GCP](https://cloud.docs.scylladb.com/stable/cluster-connections/vpc-peering/gcp-vpc-peering.md)
 
 ## Datacenter Naming Convention
 

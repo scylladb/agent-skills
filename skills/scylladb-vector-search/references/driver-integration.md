@@ -15,7 +15,7 @@ tags: vector-search, drivers, Python, Java, Go, Rust, DC-aware, shard-aware
 | Driver | Minimum Version for Vector Search | Recommended |
 |--------|----------------------------------|-------------|
 | Python (`scylla-driver`) | 3.28.0 | Latest |
-| Java (`java-driver` 4.x) | 4.16.0 | 4.19.0+ |
+| Java (`java-driver` 4.x) | 4.16.0 | Latest |
 | Java (`java-driver` 3.x) | Not supported | Upgrade to 4.x |
 | Go (`gocql`) | 1.17.0 | Latest |
 | Go (`gocqlx`) | Not yet supported | Use `gocql` directly |

@@ -98,7 +98,7 @@ Trade-off: queries for a single `event_type` now require reading up to 100 parti
 
 - **Target**: 100 MB or less per partition
 - **Soft warning**: > 100 MB — queries may become slower, compaction takes longer
-- **Hard trouble**: > 1 GB — risk of OOM during compaction, query timeouts
+- **Hard trouble**: > 1 GB — hot shard, query timeouts, slow repair and streaming
 - Monitor with `nodetool tablehistograms <keyspace>.<table>` — check the partition size percentiles
 
 Note: 100 MB is a design target, not ScyllaDB's current system default. The scylla.yaml parameter that controls ScyllaDB's own large-partition warning, compaction_large_partition_warning_threshold_mb, currently defaults to 1000 MB. Designing to the stricter 100 MB target leaves headroom before the system's own warning would fire, and is a better guide for schema design than the configured default itself.
