@@ -17,6 +17,5 @@
     "cql",
     "vector-search"
   ],
-  "skills": "./skills/",
-  "mcpServers": "./mcp.json"
+  "skills": "./skills/"
 }
