@@ -56,15 +56,16 @@ PRIMARY KEY ((partition_key_col1, partition_key_col2), clustering_col1, clusteri
 
 ## Comparison with SQL / MongoDB
 
-| Concept                    | SQL                      | MongoDB                  | ScyllaDB                                                             |
-| -------------------------- | ------------------------ | ------------------------ | -------------------------------------------------------------------- |
-| Schema design              | Entity-first (normalize) | Document-first (embed)   | Query-first (denormalize per query)                                  |
-| Data unit                  | Row in a table           | Document in a collection | Row in a partition                                                   |
-| Joins                      | `JOIN` clause            | `$lookup` aggregation    | Not supported — denormalize instead                                  |
-| Flexible schema            | No (strict DDL)          | Yes (schema-optional)    | No (strict CQL DDL)                                                  |
-| Index required for queries | Often optional           | Recommended              | Partition key required in every query                                |
-| Unique constraint          | `UNIQUE`                 | `unique: true` index     | Primary key only                                                     |
-| Transactions               | Full ACID                | Multi-document ACID      | Lightweight Transactions (LWT) for single-partition linearizable ops |
+| Concept                    | SQL                        | MongoDB                  | ScyllaDB                                                                                                                            |
+| -------------------------- | -------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Schema design              | Entity-first (normalize)   | Document-first (embed)   | Query-first (denormalize per query)                                                                                                 |
+| Data unit                  | Row in a table             | Document in a collection | Row in a partition                                                                                                                  |
+| Joins                      | `JOIN` clause              | `$lookup` aggregation    | Not supported — denormalize instead                                                                                                 |
+| Aggregates                 | Any column, any `GROUP BY` | Aggregation pipeline     | `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`; `GROUP BY` only on a primary key prefix                                                        |
+| Flexible schema            | No (strict DDL)            | Yes (schema-optional)    | No (strict CQL DDL)                                                                                                                 |
+| Index required for queries | Often optional             | Recommended              | Partition key required in every query                                                                                               |
+| Unique constraint          | `UNIQUE`                   | `unique: true` index     | Primary key only. `INSERT ... IF NOT EXISTS` (LWT) rejects duplicates; for a non-key column, insert into a lookup table keyed on it |
+| Transactions               | Full ACID                  | Multi-document ACID      | Lightweight Transactions (LWT) for single-partition linearizable ops                                                                |
 
 ## Keyspace creation (ScyllaDB 2025.4 or newer)
 
@@ -75,6 +76,8 @@ CREATE KEYSPACE myapp;
 ```
 
 Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required.
+
+Never use `SimpleStrategy`. Tablets support only `NetworkTopologyStrategy`, and many Cassandra tutorials still show `SimpleStrategy`.
 
 New keyspaces use tablets by default (controlled by `tablets_mode_for_new_keyspaces`). Check the ScyllaDB version before using these features in a tablets keyspace:
 

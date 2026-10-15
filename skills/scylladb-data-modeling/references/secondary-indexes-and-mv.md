@@ -121,6 +121,6 @@ CREATE MATERIALIZED VIEW orders_by_status AS
 
 ### ⚠️ Known Limitations
 
-- **Materialized views** in ScyllaDB can have consistency issues under certain failure scenarios. For mission-critical data, prefer application-managed denormalization with explicit writes to multiple tables
+- **Materialized views** are eventually consistent with the base table: a write to the base table updates the view asynchronously, so a read from the view can briefly return stale data. When a query must see its own writes immediately, prefer application-managed denormalization with explicit writes to multiple tables
 - **Secondary indexes** add read latency (extra round-trip to index table + base table)
 - **Neither SIs nor MVs** support arbitrary filtering — they optimize for specific column access patterns
