@@ -1,18 +1,27 @@
 # ScyllaDB Agent Skills
 
 Collection of ScyllaDB agent skills for use in agentic workflows.
-These skills provide coding agents with deep knowledge of ScyllaDB Cloud, 
-ScyllaDB CQL data modeling, and ScyllaDB Vector Search.
+These skills provide coding agents with deep knowledge of ScyllaDB.
 
 ## Installation
 
 ### CLI
+
+**Recommended**: install the `scylladb` parent skill. It gives the agent an overview of ScyllaDB and a map of the other skills.
+
+```sh
+npx skills add scylladb/agent-skills --skill scylladb
+```
+
+Install all skills:
+
 ```sh
 npx skills add scylladb/agent-skills
 ```
 
 #### Install specific skills
 ```sh
+npx skills add scylladb/agent-skills --skill scylladb
 npx skills add scylladb/agent-skills --skill scylladb-cloud-setup
 npx skills add scylladb/agent-skills --skill scylladb-cloud-mcp
 npx skills add scylladb/agent-skills --skill scylladb-data-modeling
@@ -46,6 +55,7 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 
 | Skill | Description |
 |-------|-------------|
+| [scylladb](skills/scylladb/SKILL.md) | Start here. Overview of ScyllaDB and a map of the other skills. |
 | [scylladb-cloud-setup](skills/scylladb-cloud-setup/SKILL.md) | Guide users through connecting to a ScyllaDB Cloud cluster — credentials, drivers, and connection verification. |
 | [scylladb-cloud-mcp](skills/scylladb-cloud-mcp/SKILL.md) | Set up and use the ScyllaDB Cloud MCP server to manage ScyllaDB Cloud clusters via AI agents. |
 | [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, compaction, TTL, tombstones, and common pitfalls. |

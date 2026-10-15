@@ -1,9 +1,11 @@
 ---
 name: scylladb-kubernetes
-description: Guide users deploying and operating ScyllaDB on Kubernetes via the official ScyllaDB Operator. Use this skill when a user is setting up a ScyllaCluster, configuring node storage/CPU pinning for ScyllaDB pods, installing the Operator, or troubleshooting a Kubernetes-based ScyllaDB deployment. Triggers on "ScyllaDB Operator", "ScyllaCluster", "scylla-operator", "ScyllaDB on Kubernetes", "ScyllaDB Helm chart", "NodeConfig", "ScyllaDB EKS", "ScyllaDB GKE", "ScyllaDB OKE", "ScyllaDB kubernetes deployment", "exposeOptions", "ScyllaCluster TLS/mTLS", "ScyllaDB Manager backup/restore on Kubernetes", "multi-datacenter ScyllaDB", "externalSeeds".
+description: Guide users deploying and operating ScyllaDB on Kubernetes via the official ScyllaDB Operator. Use this skill when a user is setting up a ScyllaCluster, configuring node storage/CPU pinning for ScyllaDB pods, installing the Operator, or troubleshooting a Kubernetes-based ScyllaDB deployment. Managed ScyllaDB Cloud clusters go to scylladb-cloud-setup. Triggers on "ScyllaDB Operator", "ScyllaCluster", "scylla-operator", "ScyllaDB on Kubernetes", "ScyllaDB Helm chart", "NodeConfig", "ScyllaDB EKS", "ScyllaDB GKE", "ScyllaDB OKE", "ScyllaDB kubernetes deployment", "exposeOptions", "ScyllaCluster TLS/mTLS", "ScyllaDB Manager backup/restore on Kubernetes", "multi-datacenter ScyllaDB", "externalSeeds".
 ---
 
 # ScyllaDB on Kubernetes (ScyllaDB Operator)
+
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
 
 ScyllaDB Operator is the official Kubernetes Operator for deploying and managing ScyllaDB clusters. It introduces custom resources, most importantly `ScyllaCluster`, that let Kubernetes manage ScyllaDB the way it manages any other workload, while still respecting ScyllaDB's own requirements around CPU pinning, local NVMe storage, and rack/zone topology.
 

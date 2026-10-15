@@ -1,9 +1,11 @@
 ---
 name: scylladb-data-modeling
-description: ScyllaDB CQL data modeling patterns and anti-patterns, including compaction strategy choice, TTL-based expiration, and tombstone management. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, setting data retention, or troubleshooting performance issues caused by schema problems or deletes. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size", "TTL", "default_time_to_live", "compaction strategy", "TWCS", "gc_grace_seconds", "tombstone_gc".
+description: ScyllaDB CQL data modeling patterns and anti-patterns, including compaction strategy choice, TTL-based expiration, and tombstone management. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, setting data retention, or troubleshooting performance issues caused by schema problems or deletes. Vector indexes go to scylladb-vector-search; DynamoDB API tables go to scylladb-alternator. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size", "TTL", "default_time_to_live", "compaction strategy", "TWCS", "gc_grace_seconds", "tombstone_gc".
 ---
 
 # ScyllaDB Data Modeling
+
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
 
 CQL data modeling patterns and anti-patterns for ScyllaDB. Bad schema is the root cause of most ScyllaDB performance issues — no amount of cluster scaling can fix a fundamentally wrong data model.
 

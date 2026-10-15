@@ -1,9 +1,11 @@
 ---
 name: scylladb-alternator
-description: Guide users building against ScyllaDB's DynamoDB-compatible API (Alternator). Use this skill when a user is porting a DynamoDB application to ScyllaDB, using boto3/AWS SDK clients against ScyllaDB, or asking about Alternator setup, write isolation, or load balancing. Triggers on "Alternator", "DynamoDB API", "DynamoDB compatible", "boto3 with ScyllaDB", "migrate from DynamoDB", "aws-sdk against ScyllaDB", "alternator_port", "alternator_write_isolation".
+description: Guide users building against ScyllaDB's DynamoDB-compatible API (Alternator). Use this skill when a user is porting a DynamoDB application to ScyllaDB, using boto3/AWS SDK clients against ScyllaDB, or asking about Alternator setup, write isolation, or load balancing. CQL schema design goes to scylladb-data-modeling. Triggers on "Alternator", "DynamoDB API", "DynamoDB compatible", "boto3 with ScyllaDB", "migrate from DynamoDB", "aws-sdk against ScyllaDB", "alternator_port", "alternator_write_isolation".
 ---
 
 # ScyllaDB Alternator (DynamoDB-Compatible API)
+
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
 
 Alternator is ScyllaDB's DynamoDB-compatible API: JSON requests over HTTP/HTTPS, using the same wire protocol and (mostly) the same client SDKs as Amazon DynamoDB. The goal is that an application written for DynamoDB can run against ScyllaDB largely unmodified. It is not a separate database; Alternator tables are ordinary ScyllaDB tables underneath, each in its own keyspace, with the DynamoDB hash/sort key becoming the ScyllaDB partition/clustering key.
 
