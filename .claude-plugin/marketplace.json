@@ -9,7 +9,7 @@
     {
       "name": "scylladb",
       "source": "./",
-      "description": "Official Claude plugin for ScyllaDB (MCP Server + Skills). Connect to ScyllaDB Cloud, design CQL schemas, and implement Vector Search with expert guidance."
+      "description": "Official Claude plugin for ScyllaDB (Skills). Connect to ScyllaDB Cloud, design CQL schemas, and implement Vector Search with expert guidance."
     }
   ]
 }
