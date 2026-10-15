@@ -5,6 +5,8 @@ description: Help users set up and use the ScyllaDB Cloud MCP server to manage S
 
 # ScyllaDB Cloud MCP Server
 
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
+
 The ScyllaDB Cloud MCP server exposes the ScyllaDB Cloud API as tools that AI agents can call. The server is in beta.
 
 ## When to Use This Skill

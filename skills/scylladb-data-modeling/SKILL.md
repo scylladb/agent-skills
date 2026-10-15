@@ -5,6 +5,8 @@ description: ScyllaDB CQL data modeling patterns and anti-patterns, including co
 
 # ScyllaDB Data Modeling
 
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
+
 CQL data modeling patterns and anti-patterns for ScyllaDB. Bad schema is the root cause of most ScyllaDB performance issues — no amount of cluster scaling can fix a fundamentally wrong data model.
 
 ## When to Use This Skill

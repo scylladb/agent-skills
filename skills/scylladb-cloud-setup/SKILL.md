@@ -5,6 +5,8 @@ description: Guide users through connecting to a ScyllaDB Cloud cluster, choosin
 
 # ScyllaDB Cloud Connection Setup
 
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
+
 This skill guides users through connecting their application to a ScyllaDB Cloud cluster using the appropriate CQL driver.
 
 ## When to Use This Skill

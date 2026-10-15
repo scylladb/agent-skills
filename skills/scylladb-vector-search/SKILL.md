@@ -5,6 +5,8 @@ description: Guides ScyllaDB Cloud users through implementing and optimizing Vec
 
 # ScyllaDB Vector Search
 
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
+
 Vector Search stores embeddings in a `vector<float, N>` column and answers approximate nearest neighbor (ANN) queries from an HNSW vector index. It is available only on ScyllaDB Cloud, and the index is maintained outside the table, so `TRUNCATE` does not clear it.
 
 ## When to Use This Skill

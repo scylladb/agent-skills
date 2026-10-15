@@ -5,6 +5,8 @@ description: Guide users building against ScyllaDB's DynamoDB-compatible API (Al
 
 # ScyllaDB Alternator (DynamoDB-Compatible API)
 
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
+
 Alternator is ScyllaDB's DynamoDB-compatible API: JSON requests over HTTP/HTTPS, using the same wire protocol and (mostly) the same client SDKs as Amazon DynamoDB. The goal is that an application written for DynamoDB can run against ScyllaDB largely unmodified. It is not a separate database; Alternator tables are ordinary ScyllaDB tables underneath, each in its own keyspace, with the DynamoDB hash/sort key becoming the ScyllaDB partition/clustering key.
 
 ## When to Use This Skill

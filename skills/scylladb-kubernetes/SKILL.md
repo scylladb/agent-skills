@@ -5,6 +5,8 @@ description: Guide users deploying and operating ScyllaDB on Kubernetes via the 
 
 # ScyllaDB on Kubernetes (ScyllaDB Operator)
 
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
+
 ScyllaDB Operator is the official Kubernetes Operator for deploying and managing ScyllaDB clusters. It introduces custom resources, most importantly `ScyllaCluster`, that let Kubernetes manage ScyllaDB the way it manages any other workload, while still respecting ScyllaDB's own requirements around CPU pinning, local NVMe storage, and rack/zone topology.
 
 This skill covers the official Operator model (the `ScyllaCluster`, `NodeConfig`, and `ScyllaOperatorConfig` custom resources, installed via Helm or GitOps manifests). It does not teach any one team's custom deployment scripts, several exist in the community, including a detailed sed-templated bash pipeline in the `tluck/Scylla-K8s-Example` repository, and those are useful references for a working end-to-end example, but they are one practitioner's tooling choices, not ScyllaDB's own documented interface. When a user's question is about the underlying Operator resources and requirements, ground the answer in this skill; when it's specifically about someone else's deployment scripts, say so explicitly rather than presenting their conventions as official.
