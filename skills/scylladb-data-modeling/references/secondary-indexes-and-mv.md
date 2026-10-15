@@ -28,17 +28,19 @@ CREATE INDEX ON users (email);
 SELECT * FROM users WHERE email = 'alice@example.com';
 ```
 
-**How it works**: ScyllaDB creates a hidden table mapping `email → user_id`. A query on `email` first looks up the index to find the `user_id`, then fetches the row from the base table. This adds an extra round-trip per query.
+**How it works**: ScyllaDB creates a hidden materialized view whose partition key is the indexed column (`email`) and whose clustering key is the base table's primary key. A query on `email` first reads the one index partition for that value to find the `user_id`, then fetches the row from the base table. This adds an extra round-trip per query. See the [Global Secondary Indexes docs](https://docs.scylladb.com/manual/stable/features/secondary-indexes.md).
+
+Because the index is partitioned by the indexed value, the partition-key rules from `partition-key-design.md` apply to the indexed column. This is the opposite of the Cassandra (2i) rule of thumb.
 
 **When to use**:
-- Low-to-moderate cardinality filtering (e.g., `country`, `status`)
-- Combined with the partition key: `WHERE partition_key = ? AND indexed_col = ?`
+- High-cardinality columns where each value matches few rows (e.g., `email`, `username`, `order_number`)
+- Queries without the partition key that look up by a non-primary-key column
 - Convenience queries that don't justify a separate table
 
 **When NOT to use**:
-- High-cardinality columns (e.g., `email` as a global index) — creates a distributed index that requires a scatter-gather query to ALL nodes
+- Low-cardinality columns (e.g., `status`, `country`, booleans) — all rows with the same value land in ONE index partition on one replica set, creating a large, hot index partition. Use a local index (if the partition key is known) or a bucketed denormalized table instead
 - High-throughput queries — the extra round-trip adds latency
-- Without the partition key in the WHERE clause — forces a cluster-wide scatter-gather
+- High write throughput — every base write also updates the hidden view, usually on a different node
 
 ### Local Secondary Indexes
 
@@ -107,14 +109,14 @@ CREATE MATERIALIZED VIEW orders_by_status AS
 |----------|-----------|------------|-------------|----------|
 | Denormalized table | Best (direct lookup) | Application manages writes to multiple tables | Application-level | High-throughput, well-defined queries |
 | Local secondary index | Good (single partition) | Low (index maintained automatically) | Automatic | Filtering within a partition |
-| Global secondary index | Moderate (scatter-gather without PK) | Low (index maintained automatically) | Automatic | Low-frequency queries by non-PK column |
+| Global secondary index | Moderate (index lookup + base-table read) | Moderate (hidden view updated on each write) | Automatic (eventual) | Lookups by a high-cardinality non-PK column |
 | Materialized view | Good (direct lookup on MV) | High (full data copy per MV) | Automatic (eventual) | Different partition key needed, moderate write rate |
 
 ### Decision Flow
 
 1. **Can you always provide the partition key?** → Use a local secondary index (if filtering on non-clustering column) or just clustering columns (if the filter column can be a clustering column)
 2. **Is the query high-throughput?** → Denormalized table (application-managed writes)
-3. **Is the query low-frequency / convenience?** → Global secondary index
+3. **Is the query low-frequency / convenience, on a high-cardinality column?** → Global secondary index
 4. **Do you need a completely different partition key with automatic consistency?** → Materialized view (accept write amplification)
 
 ### ⚠️ Known Limitations

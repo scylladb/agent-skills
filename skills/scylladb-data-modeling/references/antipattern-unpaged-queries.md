@@ -19,10 +19,13 @@ A SELECT without paging asks the coordinator to assemble the entire result set b
 ### Incorrect: Python Driver
 
 ```
-session.execute("SELECT * FROM events WHERE partition_key = %s", [pk])
-# No fetch_size set. The Python driver defaults to 5000 rows per page,
-# but if the result set is materially larger, or row size is large,
-# this still risks large memory allocation on both client and coordinator.
+from cassandra.query import SimpleStatement
+statement = SimpleStatement(
+    "SELECT * FROM events WHERE partition_key = %s",
+    fetch_size=None  # disables paging: the whole result comes back in one response
+)
+rows = session.execute(statement, [pk])
+# Setting session.default_fetch_size = None has the same effect for every query.
 ```
 
 ### Correct: Python Driver
@@ -62,5 +65,5 @@ let mut rows_stream = session
 
 ### How to Detect
 
-- Grep application code for query_unpaged, execute_unpaged (Rust), or SELECT calls with no fetch_size / page size argument (Python, Java, C#)
+- Grep application code for `query_unpaged`, `execute_unpaged` (Rust), or `fetch_size=None` / `default_fetch_size = None` (Python)
 - In ScyllaDB Cloud, unusually large per-query response sizes or coordinator memory pressure isolated to specific queries is the operational signal

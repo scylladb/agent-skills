@@ -39,9 +39,9 @@ Check the target ScyllaDB version before giving a user a tag name — using the 
 
 ScyllaDB snapshots a table automatically when it's deleted, but Alternator provides no API to restore from that snapshot. A DynamoDB-style `DeleteTable` call therefore leaves an unusable, unrecoverable snapshot consuming disk. Recommend setting `auto_snapshot: false` in `scylla.yaml` on Alternator-enabled clusters rather than letting this accumulate silently.
 
-### Flagged as Needing Re-Verification, Not Stated as Current Fact
+### Global Tables and Backup APIs Are Not Implemented
 
-The following two items appear in ScyllaDB's documentation, but the specific copy this was sourced from was last dated around 2021, and Alternator has changed substantially since then (tablets support alone landed in 2025.4). Re-verify against current ScyllaDB documentation before repeating either of these to a customer as a current limitation:
+- **Multi-region "global tables"**: `CreateGlobalTable`, `UpdateGlobalTable`, `DescribeGlobalTable`, `ListGlobalTables`, `UpdateGlobalTableSettings`, and `DescribeGlobalTableSettings` are not supported. Instead, every Alternator table is replicated to all DCs that exist when the table is created.
+- **On-demand and continuous backup APIs**: `CreateBackup`, `DescribeBackup`, `DeleteBackup`, `ListBackups`, `RestoreTableFromBackup`, `UpdateContinuousBackups`, `DescribeContinuousBackups`, and `RestoreTableToPointInTime` are not supported. Use ScyllaDB snapshots or ScyllaDB Manager instead.
 
-- **Multi-region "global tables"**: `CreateGlobalTable`, `UpdateGlobalTable`, `DescribeGlobalTable`, and related multi-region DynamoDB APIs were, as of that documentation, not implemented.
-- **On-demand / continuous backup APIs**: `CreateBackup`, `RestoreTableFromBackup`, and point-in-time restore APIs were, as of that same documentation, not implemented; ScyllaDB snapshots or ScyllaDB Manager were suggested as the replacement.
+See the [Alternator compatibility docs](https://docs.scylladb.com/manual/stable/alternator/compatibility.md) for the full list of unsupported APIs.

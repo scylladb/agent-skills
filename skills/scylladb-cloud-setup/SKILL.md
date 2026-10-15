@@ -51,7 +51,7 @@ Ask the user which programming language they are using so you can recommend the 
 | Language | Driver                                   | Package                                            |
 | -------- | ----------------------------------------- | --------------------------------------------------- |
 | Python   | scylla-driver                             | `pip install scylla-driver`                        |
-| Java     | java-driver (ScyllaDB's fork, 4.x line)   | `com.scylladb:java-driver-core:4.19.2.0` (Maven). Requires Java 11+ (Java 8 support was dropped as of this release). |
+| Java     | java-driver (ScyllaDB's fork, 4.x line)   | `com.scylladb:java-driver-core:4.19.2.2` (Maven). Requires Java 11+ (Java 8 support was dropped in 4.19.2.0). |
 | Go       | gocql + gocqlx                            | `go get github.com/scylladb/gocql`                 |
 | Rust     | scylla-rust-driver                        | `cargo add scylla`                                 |
 | C#       | scylla-csharp-driver                      | NuGet package                                      |
@@ -95,4 +95,4 @@ Once connected, suggest relevant next steps:
 - **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing). See `references/prepared-statements.md` for the full pattern with examples.
 - **Connection pooling**: ScyllaDB drivers handle pooling internally with shard-aware connections — typically no manual tuning needed
 - **Infrastructure as code**: If the user wants to manage cluster provisioning declaratively (not just connect an app to an existing cluster), point them to the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) rather than only the manual Console flow in Step 1.
-- **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud cluster programmatically via an AI agent (create clusters, monitor health, configure networking, etc.), the ScyllaDB Cloud MCP server is available. See the full documentation at <https://cloud.docs.scylladb.com/master/api-docs/mcp>
+- **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud clusters through an AI agent, use the `scylladb-cloud-mcp` skill.

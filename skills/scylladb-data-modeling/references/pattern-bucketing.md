@@ -21,7 +21,7 @@ CREATE TABLE sensor_data (
     value double,
     PRIMARY KEY (sensor_id, ts)
 );
--- Partition grows indefinitely → eventually OOM on compaction
+-- Partition grows indefinitely
 ```
 
 ### The Solution
