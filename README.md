@@ -19,6 +19,7 @@ npx skills add scylladb/agent-skills --skill scylladb-data-modeling
 npx skills add scylladb/agent-skills --skill scylladb-vector-search
 npx skills add scylladb/agent-skills --skill scylladb-alternator
 npx skills add scylladb/agent-skills --skill scylladb-kubernetes
+npx skills add scylladb/agent-skills --skill code-coverage-setup
 ```
 
 ### Claude Code plugin
@@ -52,6 +53,7 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 | [scylladb-vector-search](skills/scylladb-vector-search/SKILL.md) | Implement and optimize Vector Search on ScyllaDB Cloud — vector indexes, ANN queries, filtering, quantization, and driver integration. |
 | [scylladb-alternator](skills/scylladb-alternator/SKILL.md) | Build against ScyllaDB's DynamoDB-compatible API — write isolation policies, load balancing (no single endpoint like real DynamoDB), authentication via CQL roles, and compatibility differences to know before porting a DynamoDB app. |
 | [scylladb-kubernetes](skills/scylladb-kubernetes/SKILL.md) | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, client access & networking, TLS/mTLS & authentication, multi-datacenter, scaling, and monitoring/backup. |
+| [code-coverage-setup](skills/code-coverage-setup/SKILL.md) | Add, fix, or extend code coverage measurement (unit + integration tests combined into one report) in a repository — Python, Go, Rust, Java in detail, general guidance for other languages. Not ScyllaDB-specific; came out of adding coverage tooling across several ScyllaDB driver repos and captures the gotchas found doing it. |
 
 The skills follow the [Agent Skills format](https://agentskills.io).
 
