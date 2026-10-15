@@ -96,6 +96,12 @@ Write for an AI agent that already knows general databases, Cassandra, and Dynam
 - **Make examples runnable.** CQL, YAML, and driver code must be correct and complete enough to copy. Mark placeholders clearly (`<cluster-id>`, `YOUR_PASSWORD`).
 - **State version requirements.** When behavior depends on a ScyllaDB, driver, or Operator version, say which version. Example: "As of ScyllaDB 2025.4, `WITH replication` is optional."
 - **Link to the ScyllaDB docs wherever you can instead of copying them.** Copied docs go out of date. Summarize the rule the agent needs and link to the source for the full details.
+- **Link to the Markdown version of a docs page, not the HTML page.** Every page on `*.docs.scylladb.com` is also served as Markdown. Replace `.html` with `.md`, and use `index.md` for a directory URL. Check each link with `curl -sI <url>` before you commit.
+
+  | Wrong | Right |
+  | --- | --- |
+  | `https://docs.scylladb.com/manual/stable/architecture/tablets.html` | `https://docs.scylladb.com/manual/stable/architecture/tablets.md` |
+  | `https://cloud.docs.scylladb.com/stable/api-docs/` | `https://cloud.docs.scylladb.com/stable/api-docs/index.md` |
 
 ## Cross-skill boundaries
 

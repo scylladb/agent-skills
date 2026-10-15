@@ -35,4 +35,4 @@ For schema design once the cluster is running, defer to `scylladb-data-modeling`
 
 ## Version Note
 
-ScyllaDB's own documentation pages currently reference slightly different patch versions of ScyllaDB (2026.1.0 through 2026.1.3) and the Manager Agent (3.9.0 vs 3.10.1) across different guides, which appears to be a documentation sync gap rather than a single authoritative number. Don't hardcode a specific patch version into a deliverable without checking `https://operator.docs.scylladb.com` for the current stable release first.
+ScyllaDB's own documentation pages currently reference slightly different patch versions of ScyllaDB (2026.1.0 through 2026.1.3) and the Manager Agent (3.9.0 vs 3.10.1) across different guides, which appears to be a documentation sync gap rather than a single authoritative number. Don't hardcode a specific patch version into a deliverable without checking `https://operator.docs.scylladb.com/stable/index.md` for the current stable release first.

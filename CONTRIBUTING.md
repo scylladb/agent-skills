@@ -40,6 +40,7 @@ Include this in your PR description:
 
 - [ ] `./tests/validate-skills.sh` passes with no warnings
 - [ ] CQL, YAML, and code examples were run or checked against the docs
+- [ ] Links to the ScyllaDB docs use the `.md` URL, not `.html`, and resolve
 - [ ] Version-specific behavior states the version
 - [ ] No credentials, real hostnames, or customer data in examples
 - [ ] README **Skills** table and install commands updated (new or renamed skills)
