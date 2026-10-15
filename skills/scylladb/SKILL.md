@@ -38,7 +38,7 @@ docker run --name scylla -d -p 9042:9042 scylladb/scylla --smp 1 --memory 1G
 
 ## Features
 
-- **Vector Search** — [ANN queries over vector columns](https://cloud.docs.scylladb.com/stable/vector-search/index.md). ScyllaDB Cloud only.
+- **Vector Search** — [ANN queries over vector columns](https://cloud.docs.scylladb.com/stable/vector-search/index.md). ScyllaDB Cloud only for production; runs locally in Docker for testing.
 
 ## Tools
 

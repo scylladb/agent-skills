@@ -1,13 +1,13 @@
 ---
 name: scylladb-vector-search
-description: Guides ScyllaDB Cloud users through implementing and optimizing Vector Search for semantic similarity, RAG, and similar use cases. Use this skill when users need to store and query embeddings, build vector indexes (HNSW), run approximate nearest neighbour (ANN) queries, apply filtering (global/local secondary indexes), configure quantization, or integrate with LLM frameworks (e.g. LangChain) in the context of ScyllaDB. Schema design outside the vector column goes to scylladb-data-modeling. Triggers on "vector", "embeddings", "similarity search", "ANN", "nearest neighbor", "RAG", "semantic search", "recommendation system", "vector index", "HNSW".
+description: Guides users through implementing and optimizing ScyllaDB Vector Search for semantic similarity, RAG, and similar use cases. Use this skill when users need to store and query embeddings, build vector indexes (HNSW), run approximate nearest neighbour (ANN) queries, apply filtering (global/local secondary indexes), configure quantization, integrate with LLM frameworks (e.g. LangChain), or run Vector Search locally with Docker for testing. Schema design outside the vector column goes to scylladb-data-modeling. Triggers on "vector", "embeddings", "similarity search", "ANN", "nearest neighbor", "RAG", "semantic search", "recommendation system", "vector index", "HNSW", "vector-store".
 ---
 
 # ScyllaDB Vector Search
 
 If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
 
-Vector Search stores embeddings in a `vector<float, N>` column and answers approximate nearest neighbor (ANN) queries from an HNSW vector index. It is available only on ScyllaDB Cloud, and the index is maintained outside the table, so `TRUNCATE` does not clear it.
+Vector Search stores embeddings in a `vector<float, N>` column and answers approximate nearest neighbor (ANN) queries from an HNSW vector index. For production it is available only on ScyllaDB Cloud. The index is maintained outside the table, so `TRUNCATE` does not clear it.
 
 ## When to Use This Skill
 
@@ -17,6 +17,7 @@ Vector Search stores embeddings in a `vector<float, N>` column and answers appro
 - The user needs to combine ANN queries with filters on other columns
 - The user wants to reduce vector index memory with quantization
 - The user needs a driver version that supports the `vector` CQL type
+- The user wants to try Vector Search locally or in CI with Docker
 
 For adjacent topics, use the sibling skill instead:
 
@@ -24,9 +25,10 @@ For adjacent topics, use the sibling skill instead:
 - Connecting to the Cloud cluster and choosing a driver: `scylladb-cloud-setup`
 - Similarity search through the DynamoDB API instead of CQL: `scylladb-alternator`
 
-## ScyllaDB Cloud Only
+## Where Vector Search Runs
 
-Vector Search is a **ScyllaDB Cloud feature**. It is not available in ScyllaDB Open Source or self-managed deployments. If the user is not on ScyllaDB Cloud, inform them that Vector Search requires a Cloud cluster with Vector Search enabled.
+- **Production: ScyllaDB Cloud only.** Self-managed Vector Search is not tested or supported for production. If the user plans a self-managed production deployment, tell them it requires ScyllaDB Cloud with Vector Search enabled.
+- **Development and testing: local Docker.** Run a ScyllaDB container plus a separate `scylladb/vector-store` container (the indexing service) connected to it. See [local-docker](references/local-docker.md).
 
 ## Core Principles
 
@@ -102,12 +104,13 @@ ANN queries require a `LIMIT` — ScyllaDB will reject the query without one.
 ## Handling Edge Cases
 
 **User doesn't have an embedding model yet:**
-- Recommend starting with `all-MiniLM-L6-v2` (384 dims, open-source, good general-purpose)
+- Recommend starting with `all-MiniLM-L6-v2` (384 dims, open weights, good general-purpose)
 - For production: suggest evaluating OpenAI or Cohere embedding models
 
 **User's cluster doesn't have Vector Search enabled:**
 - Direct them to the ScyllaDB Cloud UI → cluster settings → enable Vector Search
 - See [Vector Search Deployments](https://cloud.docs.scylladb.com/stable/vector-search/vector-search-clusters.md) for setup
+- On a local Docker setup, check that the `vector-store` container is running and ScyllaDB has `--vector-store-primary-uri` set (see [local-docker](references/local-docker.md))
 
 **Query returns no results:**
 - Check write-to-query latency (~1 second delay after insert)
@@ -129,3 +132,4 @@ ANN queries require a `LIMIT` — ScyllaDB will reject the query without one.
 - [filtering](references/filtering.md) — Global vs. local vector indexes, schema design for filtered and multi-tenant search, and their limitations. Consult when an ANN query needs a `WHERE` clause.
 - [quantization](references/quantization.md) — Quantization levels (`f16`, `bf16`, `i8`, `b1`), oversampling, rescoring, and why index options cannot change after creation. Consult when the dataset is over about 1M vectors or index memory is a concern.
 - [driver-integration](references/driver-integration.md) — Minimum driver versions for the `vector` type and insert/query examples in Python, Java, Go, and Node.js. Consult when writing application code that reads or writes vectors.
+- [local-docker](references/local-docker.md) — Running ScyllaDB and the Vector Store service together in Docker, the flags and environment variables that connect them, and why this setup is not for production. Consult when the user wants Vector Search locally, in CI, or in tests, or has no ScyllaDB Cloud cluster.
