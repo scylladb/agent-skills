@@ -95,7 +95,7 @@ Write for an AI agent that already knows general databases, Cassandra, and Dynam
 - **Show wrong and right.** For anti-patterns, give the incorrect example, then the correct one, then when the rule does not apply. `scylladb-data-modeling/references/` shows the format.
 - **Make examples runnable.** CQL, YAML, and driver code must be correct and complete enough to copy. Mark placeholders clearly (`<cluster-id>`, `YOUR_PASSWORD`).
 - **State version requirements.** When behavior depends on a ScyllaDB, driver, or Operator version, say which version. Example: "As of ScyllaDB 2025.4, `WITH replication` is optional."
-- **Link to the ScyllaDB docs wherever you can instead of copying them.** Copied docs go out of date. Summarize the rule the agent needs and link to the source for the full details.
+- **Link to the ScyllaDB docs wherever you can instead of copying them.** Copied docs go out of date. Summarize the rule the agent needs in one sentence and link to the source, inline, where the rule appears. A list of links at the end of the file does not replace this: if the body restates a docs page, it is still a copy. When you read the docs to check facts, use them to verify and to link to, not as text to rewrite.
 - **Link to the Markdown version of a docs page, not the HTML page.** Every page on `*.docs.scylladb.com` is also served as Markdown. Replace `.html` with `.md`, and use `index.md` for a directory URL. Check each link with `curl -sI <url>` before you commit.
 
   | Wrong | Right |
@@ -144,5 +144,7 @@ CI runs [skill-validator](https://github.com/agent-ecosystem/skill-validator) in
 ```
 
 It checks the frontmatter, the name/directory match, broken internal links, orphan files, unclosed code fences, keyword-stuffed descriptions, and size limits. If `skill-validator` is not installed, tell the user to install it (`go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@latest`). Do not skip validation.
+
+Before you finish, check every paragraph of new or changed content: if a docs page already says it, replace it with a one-sentence summary and an inline link. Keep only what the docs leave out or what the agent would get wrong: version history of defaults, limits documented only in the config reference or source, differences from Cassandra or DynamoDB, and wrong/right examples.
 
 The validator cannot check that the content is correct. Verify version numbers, defaults, and config keys against the ScyllaDB documentation or a running cluster.

@@ -1,6 +1,6 @@
 ---
 name: scylladb-data-modeling
-description: ScyllaDB CQL data modeling patterns and anti-patterns. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, or troubleshooting performance issues caused by schema problems. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size".
+description: ScyllaDB CQL data modeling patterns and anti-patterns, including compaction strategy choice, TTL-based expiration, and tombstone management. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, setting data retention, or troubleshooting performance issues caused by schema problems or deletes. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size", "TTL", "default_time_to_live", "compaction strategy", "TWCS", "gc_grace_seconds", "tombstone_gc".
 ---
 
 # ScyllaDB Data Modeling
@@ -18,6 +18,8 @@ CQL data modeling patterns and anti-patterns for ScyllaDB. Bad schema is the roo
 - Seeing large partition warnings in logs
 - Encountering `ALLOW FILTERING` in queries or code reviews
 - Adding secondary indexes or materialized views
+- Choosing a compaction strategy, or setting TTLs and retention on a table
+- Reads slowed by deletes, expired data, or tombstone warnings
 
 For adjacent topics, use the sibling skill instead:
 
@@ -112,3 +114,9 @@ Each reference explains why the rule matters, shows incorrect and correct CQL, a
 
 - [pattern-bucketing](references/pattern-bucketing.md) — Split unbounded partitions into bounded time buckets (e.g., one partition per day/hour). Essential for time-series and IoT data. Consult when rows accumulate per partition key without a limit.
 - [secondary-indexes-and-mv](references/secondary-indexes-and-mv.md) — When to use secondary indexes, local secondary indexes, and materialized views — and when to prefer a denormalized table instead. Consult when a query filters on a column outside the primary key, or before adding `CREATE INDEX` or `CREATE MATERIALIZED VIEW`.
+
+### 4. Data Lifecycle — 3 rules
+
+- [compaction-strategies](references/compaction-strategies.md) — Choosing ICS, LCS, or TWCS per workload, the TWCS rules, and safely changing compaction options. Consult when creating a table, when writing a `compaction = {...}` clause, or when disk usage or write amplification is high.
+- [ttl](references/ttl.md) — Per-cell TTL semantics, `default_time_to_live`, per-row TTL (ScyllaDB 2026.2+), and how expired data leaves the disk. Consult when data has a retention period, when using `USING TTL`, or when rows expire only partially.
+- [tombstones](references/tombstones.md) — What creates tombstones, `tombstone_gc` modes and their defaults, ScyllaDB's empty-page behavior, and the queue anti-pattern. Consult when designing deletes, when reads slow down after deletes, when pages come back empty, or before changing `gc_grace_seconds`.

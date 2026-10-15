@@ -48,7 +48,7 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 |-------|-------------|
 | [scylladb-cloud-setup](skills/scylladb-cloud-setup/SKILL.md) | Guide users through connecting to a ScyllaDB Cloud cluster — credentials, drivers, and connection verification. |
 | [scylladb-cloud-mcp](skills/scylladb-cloud-mcp/SKILL.md) | Set up and use the ScyllaDB Cloud MCP server to manage ScyllaDB Cloud clusters via AI agents. |
-| [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, and common pitfalls. |
+| [scylladb-data-modeling](skills/scylladb-data-modeling/SKILL.md) | CQL data modeling patterns and anti-patterns. Query-first design, partition keys, clustering columns, compaction, TTL, tombstones, and common pitfalls. |
 | [scylladb-vector-search](skills/scylladb-vector-search/SKILL.md) | Implement and optimize Vector Search on ScyllaDB Cloud — vector indexes, ANN queries, filtering, quantization, and driver integration. |
 | [scylladb-alternator](skills/scylladb-alternator/SKILL.md) | Build against ScyllaDB's DynamoDB-compatible API — write isolation policies, load balancing (no single endpoint like real DynamoDB), authentication via CQL roles, and compatibility differences to know before porting a DynamoDB app. |
 | [scylladb-kubernetes](skills/scylladb-kubernetes/SKILL.md) | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, client access & networking, TLS/mTLS & authentication, multi-datacenter, scaling, and monitoring/backup. |

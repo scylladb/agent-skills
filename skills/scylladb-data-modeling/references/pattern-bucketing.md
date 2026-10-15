@@ -118,7 +118,7 @@ CREATE TABLE sensor_data (
 ) WITH default_time_to_live = 2592000;  -- 30 days
 ```
 
-⚠️ TTL creates tombstones. With time-bucketed data this is typically fine because entire partitions age out together and are compacted away efficiently.
+⚠️ TTL creates tombstones. With time-bucketed data this is typically fine because entire partitions age out together and are compacted away efficiently. Use one table-wide TTL and `TimeWindowCompactionStrategy` so whole SSTables drop at once. See [ttl.md](ttl.md) and [compaction-strategies.md](compaction-strategies.md).
 
 ### When NOT to Use Bucketing
 
