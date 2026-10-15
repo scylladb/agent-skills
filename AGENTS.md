@@ -8,6 +8,8 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
 
 ```
 skills/
+  scylladb/               # parent skill: overview and map of the other skills
+    SKILL.md
   scylladb-<topic>/
     SKILL.md              # required: frontmatter + instructions
     references/           # optional: detail loaded on demand
@@ -22,7 +24,7 @@ tests/validate-skills.sh  # local validation
 
 ## Naming
 
-- Directory name: `scylladb-<topic>`, kebab-case. Example: `scylladb-vector-search`.
+- Directory name: `scylladb-<topic>`, kebab-case. Example: `scylladb-vector-search`. The one exception is the parent skill, `scylladb` (see "The parent skill" below).
 - The frontmatter `name` must equal the directory name exactly.
 - `name`: 1-64 characters, lowercase letters, digits, and single hyphens. No leading, trailing, or double hyphens.
 - The skill file is always `SKILL.md` (uppercase).
@@ -45,7 +47,7 @@ The description is the only part of the skill the agent sees before it decides t
 - End with a `Triggers on "..."` list of the words a user will actually type: product names, config keys, error messages, CQL keywords.
 - Keep the prose part longer than the trigger list. The validator flags descriptions that are mostly keywords.
 - Maximum 1024 characters.
-- If the topic overlaps with another skill, say so in the body (see "Cross-skill boundaries" below), not in the trigger list.
+- Add one sentence before `Triggers on` that sends the closest adjacent topic to the correct skill, for example "CQL schema design goes to scylladb-data-modeling." Keep skill names out of the trigger list (see "Cross-skill boundaries" below).
 
 ## SKILL.md body
 
@@ -56,6 +58,8 @@ Keep SKILL.md short. Its job is to give the agent the most important rules and t
 
 ```markdown
 # <Skill Title>
+
+If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
 
 <1-3 sentences: what this covers and the single most important fact.>
 
@@ -76,6 +80,11 @@ Keep SKILL.md short. Its job is to give the agent the most important rules and t
 ```
 
 - In the Quick Reference, every link has a "Consult when ..." clause. That clause is what tells the agent to open the file, so make it specific.
+- Copy the parent pointer line exactly as shown. It is conditional on purpose: an unconditional "use the parent first" line makes the agent load or fetch the parent on every use of the child.
+
+## The parent skill
+
+`skills/scylladb/SKILL.md` is the entry point: a short ScyllaDB overview and a map of the other skills. It does not follow the outline above. Do not edit it unless a skill, API, feature, or tool is added, renamed, or removed. Then change only the affected entry in "How to Run ScyllaDB", "APIs", "Features", or "Tools", in "Choosing the Right Skill", and the `description`. Do not move content from a child skill into the parent.
 
 ## References
 
@@ -108,7 +117,7 @@ Write for an AI agent that already knows general databases, Cassandra, and Dynam
 Skills must not contradict each other or duplicate the same content.
 
 - Before adding content, check whether another skill in `skills/` already covers it. If it does, link to that skill by name instead of repeating the content.
-- When a topic is near another skill's scope, state the boundary in "When to Use This Skill". Example from `scylladb-alternator`: "For schema design guidance ... defer to the `scylladb-data-modeling` skill."
+- When a topic is near another skill's scope, state the boundary in two places: one sentence in the `description` ("X goes to `<skill>`", see "Frontmatter" above), and in "When to Use This Skill". Example from `scylladb-alternator`: "For schema design guidance ... defer to the `scylladb-data-modeling` skill."
 - If you change a fact (a default, a version, a recommended driver) in one skill, search all of `skills/` for the same fact and update every occurrence.
 
 ## Safety
@@ -119,18 +128,22 @@ Skills must not contradict each other or duplicate the same content.
 
 ## Adding a new skill
 
-1. Create `skills/scylladb-<topic>/SKILL.md` with the frontmatter and outline above.
+1. Create `skills/scylladb-<topic>/SKILL.md` with the frontmatter and outline above, including the parent pointer line and a boundary sentence in the description.
 2. Add `references/` files as needed and link each one from SKILL.md.
-3. Update `README.md`:
+3. Update the parent skill `skills/scylladb/SKILL.md`:
+   - add a row to the "Choosing the Right Skill" table
+   - add the new topic to the parent `description`; name the skill there only if its topic overlaps with general ScyllaDB tasks
+4. Update `README.md`:
    - add a row to the **Skills** table
    - add a `npx skills add scylladb/agent-skills --skill scylladb-<topic>` line under **Install specific skills**
-4. If the new skill changes the scope of the bundle, update the `description` and `keywords` in `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.cursor-plugin/plugin.json`, and `.cursor-plugin/marketplace.json`.
-5. Run the validator (see below) and fix all errors and warnings.
+5. If the new skill changes the scope of the bundle, update the `description` and `keywords` in `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.cursor-plugin/plugin.json`, and `.cursor-plugin/marketplace.json`.
+6. Run the validator (see below) and fix all errors and warnings.
 
 ## Editing an existing skill
 
 - Keep the existing outline and tone of that skill.
 - If you rename or delete a reference file, update every link to it.
+- If you rename or remove a skill, update the parent skill's "Choosing the Right Skill" table and `description`, the README, and the plugin manifests.
 - If you change the `description`, keep the existing trigger phrases unless they are wrong. Removing a trigger can stop the skill from loading for users who rely on it.
 - If the change affects the summary in the README **Skills** table, update the table.
 
