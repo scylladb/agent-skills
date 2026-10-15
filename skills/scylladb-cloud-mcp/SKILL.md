@@ -7,6 +7,18 @@ description: Help users set up and use the ScyllaDB Cloud MCP server to manage S
 
 The ScyllaDB Cloud MCP server exposes the ScyllaDB Cloud API as tools that AI agents can call. The server is in beta.
 
+## When to Use This Skill
+
+- The user wants to add the ScyllaDB Cloud MCP server to Claude Code, Cursor, or another MCP client
+- The user wants an AI agent to create, delete, or monitor ScyllaDB Cloud clusters
+- The user needs an API token for the MCP server, or committed a token by mistake
+- The user is building an agentic workflow that manages ScyllaDB Cloud resources
+
+For adjacent topics, use the sibling skill instead:
+
+- Connecting an application to a cluster with a CQL driver, or provisioning clusters with Terraform: `scylladb-cloud-setup`
+- Self-managed clusters on Kubernetes: `scylladb-kubernetes`
+
 ## Setup
 
 1. Fetch the MCP documentation for the server URL, the tool list, and the client configuration: <https://cloud.docs.scylladb.com/stable/api-docs/mcp.md>

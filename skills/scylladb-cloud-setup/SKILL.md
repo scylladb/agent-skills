@@ -7,6 +7,22 @@ description: Guide users through connecting to a ScyllaDB Cloud cluster, choosin
 
 This skill guides users through connecting their application to a ScyllaDB Cloud cluster using the appropriate CQL driver.
 
+## When to Use This Skill
+
+- The user needs to connect an application to a ScyllaDB Cloud cluster for the first time
+- The user asks which CQL driver to use for their language, or which driver version
+- The user is configuring credentials, contact points, or DC-aware load balancing
+- A connection to ScyllaDB Cloud fails or times out
+- The user is setting up IP allowlisting or VPC peering
+
+For adjacent topics, use the sibling skill instead:
+
+- Schema and table design after the connection works: `scylladb-data-modeling`
+- Vector columns, vector indexes, and driver versions with `vector` type support: `scylladb-vector-search`
+- Managing ScyllaDB Cloud clusters from an AI agent: `scylladb-cloud-mcp`
+- Self-managed clusters on Kubernetes: `scylladb-kubernetes`
+- DynamoDB SDK clients instead of CQL drivers: `scylladb-alternator`
+
 ## Overview
 
 Connecting to ScyllaDB Cloud requires:
@@ -62,13 +78,13 @@ Ask the user which programming language they are using so you can recommend the 
 
 ## Step 4: Configure the Connection
 
-Consult `references/driver-configuration.md` for per-language connection snippets.
+Consult [driver-configuration](references/driver-configuration.md) for per-language connection snippets.
 
 **Critical requirements for ScyllaDB Cloud:**
 
 **Authentication** — `PlainTextAuthProvider` with the username and password from Step 2.
 
-Consult `references/cloud-connection.md` for details on IP allowlisting and VPC peering.
+Consult [cloud-connection](references/cloud-connection.md) for details on IP allowlisting and VPC peering.
 
 ## Step 5: Test the Connection
 
@@ -92,7 +108,13 @@ Once connected, suggest relevant next steps:
 
 - **Data modeling**: Use the `scylladb-data-modeling` skill for schema design guidance
 - **Vector search**: Use the `scylladb-vector-search` skill if they need similarity search
-- **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing). See `references/prepared-statements.md` for the full pattern with examples.
+- **Prepared statements**: Recommend using prepared statements for all frequently-run queries (reduces parsing overhead, enables token-aware routing). See [prepared-statements](references/prepared-statements.md) for the full pattern with examples.
 - **Connection pooling**: ScyllaDB drivers handle pooling internally with shard-aware connections — typically no manual tuning needed
 - **Infrastructure as code**: If the user wants to manage cluster provisioning declaratively (not just connect an app to an existing cluster), point them to the [ScyllaDB Cloud Terraform provider](https://registry.terraform.io/providers/scylladb/scylladbcloud/latest/docs) rather than only the manual Console flow in Step 1.
 - **ScyllaDB Cloud MCP server**: If the user wants to manage their ScyllaDB Cloud clusters through an AI agent, use the `scylladb-cloud-mcp` skill.
+
+## Quick Reference
+
+- [cloud-connection](references/cloud-connection.md) — Connection parameters, IP allowlisting, VPC peering, the Cloud datacenter naming convention, and common connection errors. Consult when a connection fails, or before allowlisting a client IP or setting up VPC peering.
+- [driver-configuration](references/driver-configuration.md) — Connection code for each ScyllaDB driver (Python, Java, Go, Rust, C#, Node.js, C++) with `PlainTextAuthProvider` and DC-aware load balancing. Consult when writing or reviewing the connection code for the user's language.
+- [prepared-statements](references/prepared-statements.md) — Why prepared statements are required for token-aware and shard-aware routing, with incorrect and correct examples. Consult when the application runs the same query repeatedly, or when reviewing code that builds CQL strings at runtime.

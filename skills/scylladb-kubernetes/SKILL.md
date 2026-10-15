@@ -22,6 +22,21 @@ This skill covers the official Operator model (the `ScyllaCluster`, `NodeConfig`
 
 For schema design once the cluster is running, defer to `scylladb-data-modeling`. For DynamoDB-API access, defer to `scylladb-alternator`, Alternator can be enabled on a Kubernetes-deployed cluster the same as anywhere else.
 
+## Core Rules
+
+Apply these to every production `ScyllaCluster`, even if you read no reference. A cluster that breaks them still starts and looks healthy, so the mistake is easy to miss.
+
+1. **Set `cpuManagerPolicy: static` on the kubelet of every ScyllaDB node pool.** Without it, ScyllaDB threads move between cores and the shard-per-core design loses its latency benefit.
+2. **Get Guaranteed QoS: set `requests` equal to `limits` in both `resources` and `agentResources`.** Only Guaranteed pods get pinned cores. Mismatched values, or a missing `agentResources` block, silently disable pinning.
+3. **Use XFS on local NVMe.** XFS is required, not recommended. Provision local NVMe with `NodeConfig` and the ScyllaDB Local CSI Driver. Use network-attached storage (`pd-ssd`, `gp3`) only for development.
+4. **Use as many racks as the replication factor, one rack per availability zone.** With RF=3, use 3 racks in 3 zones, and keep `members` equal across racks.
+5. **Run one ScyllaDB pod per Kubernetes node.** Use a dedicated, tainted node pool and `podAntiAffinity` on `kubernetes.io/hostname`. Put the Operator, monitoring, the Manager server, and applications on separate node pools.
+6. **Do not set networking, listen/broadcast addresses, or seeds in the `scyllaConfig` ConfigMap.** The Operator manages them and silently overrides your values.
+
+## Version Note
+
+ScyllaDB's own documentation pages currently reference slightly different patch versions of ScyllaDB (2026.1.0 through 2026.1.3) and the Manager Agent (3.9.0 vs 3.10.1) across different guides, which appears to be a documentation sync gap rather than a single authoritative number. Don't hardcode a specific patch version into a deliverable without checking `https://operator.docs.scylladb.com/stable/index.md` for the current stable release first.
+
 ## Quick Reference
 
 ### Reference Files — 6
@@ -32,7 +47,3 @@ For schema design once the cluster is running, defer to `scylladb-data-modeling`
 - [monitoring-and-operations](references/monitoring-and-operations.md) — Why ScyllaDB Monitoring should always be installed alongside a cluster, how ScyllaDB Manager already ships inside every ScyllaDB pod rather than needing a separate install, object-storage/credentials setup (S3/GCS/MinIO) for backups, and that restore is its own deliberate procedure. Consult when a user asks about observability or backup/repair/restore automation.
 - [client-access-and-networking](references/client-access-and-networking.md) — `exposeOptions`: the per-node Service (`nodeService.type`: Headless/ClusterIP/LoadBalancer) and the broadcast address (`broadcastOptions.clients`/`nodes`: PodIP/ServiceClusterIP/ServiceLoadBalancerIngress), how to match them for in-cluster vs external vs multi-DC access, and the CQL/Alternator ports. Consult when an application can't reach the cluster or you're planning external/cross-DC connectivity.
 - [security-tls-and-auth](references/security-tls-and-auth.md) — Changing the default `cassandra` superuser, enabling password auth, the Operator's auto-generated TLS (serving CA, admin client cert, connection bundle) for client-to-node and node-to-node encryption, extracting certs for clients, mTLS as an auth mechanism, and when custom certs are needed (multi-DC). Consult for any deployment that has to be secured.
-
-## Version Note
-
-ScyllaDB's own documentation pages currently reference slightly different patch versions of ScyllaDB (2026.1.0 through 2026.1.3) and the Manager Agent (3.9.0 vs 3.10.1) across different guides, which appears to be a documentation sync gap rather than a single authoritative number. Don't hardcode a specific patch version into a deliverable without checking `https://operator.docs.scylladb.com/stable/index.md` for the current stable release first.
