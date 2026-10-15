@@ -1,12 +1,26 @@
 ---
 name: scylladb-vector-search
-description: |
-  Guides ScyllaDB Cloud users through implementing and optimizing Vector Search for semantic similarity, RAG, and similar use cases. Use this skill when users need to store and query embeddings, build vector indexes (HNSW), run approximate nearest neighbour (ANN) queries, apply filtering (global/local secondary indexes), configure quantization, or integrate with LLM frameworks (e.g. LangChain). Also use when users mention "vector", "embeddings", "similarity search", "ANN", "nearest neighbor", "RAG", "semantic search", or "recommendation system" in the context of ScyllaDB.
+description: Guides ScyllaDB Cloud users through implementing and optimizing Vector Search for semantic similarity, RAG, and similar use cases. Use this skill when users need to store and query embeddings, build vector indexes (HNSW), run approximate nearest neighbour (ANN) queries, apply filtering (global/local secondary indexes), configure quantization, or integrate with LLM frameworks (e.g. LangChain) in the context of ScyllaDB. Triggers on "vector", "embeddings", "similarity search", "ANN", "nearest neighbor", "RAG", "semantic search", "recommendation system", "vector index", "HNSW".
 ---
 
 # ScyllaDB Vector Search
 
-You are helping ScyllaDB Cloud users implement, optimize, and troubleshoot Vector Search for similarity-based queries. Your goal is to understand their use case, recommend the right configuration, and help them build effective vector indexes and ANN queries.
+Vector Search stores embeddings in a `vector<float, N>` column and answers approximate nearest neighbor (ANN) queries from an HNSW vector index. It is available only on ScyllaDB Cloud, and the index is maintained outside the table, so `TRUNCATE` does not clear it.
+
+## When to Use This Skill
+
+- The user wants to store embeddings in ScyllaDB and run similarity search
+- The user is building semantic search, RAG, or a recommendation system on ScyllaDB
+- The user is creating a vector index or tuning HNSW parameters
+- The user needs to combine ANN queries with filters on other columns
+- The user wants to reduce vector index memory with quantization
+- The user needs a driver version that supports the `vector` CQL type
+
+For adjacent topics, use the sibling skill instead:
+
+- Partition keys and table design for the non-vector parts of the schema: `scylladb-data-modeling`
+- Connecting to the Cloud cluster and choosing a driver: `scylladb-cloud-setup`
+- Similarity search through the DynamoDB API instead of CQL: `scylladb-alternator`
 
 ## ScyllaDB Cloud Only
 
@@ -51,13 +65,7 @@ Before creating tables and indexes, establish:
 
 ### 3. Consult Reference Files
 
-Always consult the appropriate reference file(s) before recommending indexes or queries:
-
-- **Table + index creation**: consult `references/vector-type-and-indexing.md`
-- **ANN queries**: consult `references/ann-queries.md`
-- **Filtering (global vs. local indexes)**: consult `references/filtering.md`
-- **Quantization / memory optimization**: consult `references/quantization.md`
-- **Driver setup for vector search**: consult `references/driver-integration.md`
+Always consult the matching file in the [Quick Reference](#quick-reference) before recommending indexes or queries.
 
 ### 4. Implementation
 
@@ -110,4 +118,12 @@ ANN queries require a `LIMIT` — ScyllaDB will reject the query without one.
 
 **User wants to clear all vectors (reset the table):**
 - `TRUNCATE` does **not** clear the vector index. The vector store updates its index only through CDC, and `TRUNCATE` is not propagated to CDC — the `CUSTOM INDEX` remains, and previously indexed vectors stay in memory.
-- The only correct solution is to **drop and recreate both the table and the custom index**. See `references/vector-type-and-indexing.md` for the exact DDL.
+- The only correct solution is to **drop and recreate both the table and the custom index**. See [vector-type-and-indexing](references/vector-type-and-indexing.md) for the exact DDL.
+
+## Quick Reference
+
+- [vector-type-and-indexing](references/vector-type-and-indexing.md) — The `vector` type, the tablets requirement, `CREATE CUSTOM INDEX ... USING 'vector_index'`, similarity functions, HNSW parameters, and why `TRUNCATE` does not clear the index. Consult before creating a vector table or index, or when the user wants to reset vector data.
+- [ann-queries](references/ann-queries.md) — `ORDER BY ... ANN OF ... LIMIT` syntax, similarity scores, write-to-query latency, and CQL features that ANN queries do not support. Consult when writing or debugging an ANN query.
+- [filtering](references/filtering.md) — Global vs. local vector indexes, schema design for filtered and multi-tenant search, and their limitations. Consult when an ANN query needs a `WHERE` clause.
+- [quantization](references/quantization.md) — Quantization levels (`f16`, `bf16`, `i8`, `b1`), oversampling, rescoring, and why index options cannot change after creation. Consult when the dataset is over about 1M vectors or index memory is a concern.
+- [driver-integration](references/driver-integration.md) — Minimum driver versions for the `vector` type and insert/query examples in Python, Java, Go, and Node.js. Consult when writing application code that reads or writes vectors.

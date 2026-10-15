@@ -7,9 +7,7 @@ description: ScyllaDB CQL data modeling patterns and anti-patterns. Use when des
 
 CQL data modeling patterns and anti-patterns for ScyllaDB. Bad schema is the root cause of most ScyllaDB performance issues — no amount of cluster scaling can fix a fundamentally wrong data model.
 
-## When to Apply
-
-Reference these guidelines when:
+## When to Use This Skill
 
 - Designing a new ScyllaDB schema from scratch
 - Migrating from SQL/relational databases, MongoDB, or Cassandra to ScyllaDB
@@ -20,6 +18,13 @@ Reference these guidelines when:
 - Seeing large partition warnings in logs
 - Encountering `ALLOW FILTERING` in queries or code reviews
 - Adding secondary indexes or materialized views
+
+For adjacent topics, use the sibling skill instead:
+
+- Connecting a driver, choosing a driver, or preparing statements: `scylladb-cloud-setup`
+- Vector columns, vector indexes, and ANN queries: `scylladb-vector-search`
+- Tables created through the DynamoDB API: `scylladb-alternator`. The partition-key rules in this skill still apply to them.
+- Deploying the cluster on Kubernetes, including rack and replication-factor layout: `scylladb-kubernetes`
 
 ## Key Principle
 
@@ -32,27 +37,6 @@ This is ScyllaDB's core data modeling philosophy. Unlike relational databases wh
 3. **Accept denormalization** — the same data may exist in multiple tables, each optimized for a different access pattern
 
 In ScyllaDB, the partition key determines **which node** holds the data and the clustering columns determine **the sort order within** that partition. The primary key IS your access pattern.
-
-## Quick Reference
-
-### 1. Anti-Patterns — 5 rules
-
-- [antipattern-allow-filtering](references/antipattern-allow-filtering.md) — `ALLOW FILTERING` forces a full-scan. Consult this reference whenever you see it in a query, or when a query does not include the full partition key.
-- [antipattern-large-partitions](references/antipattern-large-partitions.md) — Partitions that grow without bounds cause hot shards, slow reads, and slow repair and streaming. Consult when designing time-series tables or any table where rows accumulate per partition key.
-- [antipattern-hot-partitions](references/antipattern-hot-partitions.md) — Uneven partition key distribution causes some nodes/shards to be overloaded while others sit idle. Consult when choosing partition keys for high-write workloads.
-- [antipattern-unpaged-queries](references/antipattern-unpaged-queries.md) — Unpaged SELECTs cause unbounded memory growth and cluster instability. Consult when a query may return more rows than a single page, or when reviewing code that calls raw/unpaged execution methods.
-- [antipattern-multi-partition-batch](references/antipattern-multi-partition-batch.md) — BATCH statements spanning multiple partitions provide no real atomicity benefit and create coordinator hotspots. Consult when reviewing code that uses BATCH to simulate a transaction, or when migrating SQL transaction logic to CQL.
-
-### 2. Fundamentals — 3 rules
-
-- [query-first-design](references/query-first-design.md) — Design tables from queries, not entities. The methodology for translating application access patterns into CQL table definitions.
-- [partition-key-design](references/partition-key-design.md) — How to choose partition keys that distribute data evenly and support your queries. Includes composite partition keys.
-- [clustering-columns](references/clustering-columns.md) — How clustering columns control sort order within a partition, and how to use them for range queries and time-ordered data.
-
-### 3. Patterns — 2 rules
-
-- [pattern-bucketing](references/pattern-bucketing.md) — Split unbounded partitions into bounded time buckets (e.g., one partition per day/hour). Essential for time-series and IoT data.
-- [secondary-indexes-and-mv](references/secondary-indexes-and-mv.md) — When to use secondary indexes, local secondary indexes, and materialized views — and when to prefer a denormalized table instead.
 
 ## Primary Key Structure
 
@@ -69,18 +53,6 @@ PRIMARY KEY ((partition_key_col1, partition_key_col2), clustering_col1, clusteri
 1. **The partition key MUST appear in every `WHERE` clause** — queries that don't specify the full partition key require `ALLOW FILTERING` (a full-scan) or a secondary index
 2. **Clustering columns define sort order** — `ASC` by default, configurable with `WITH CLUSTERING ORDER BY`
 3. **Partition key determines data distribution** — all rows with the same partition key live on the same node/shard
-
-## How to Use
-
-Each reference file listed above contains detailed explanations and CQL examples. Use the descriptions in the Quick Reference to identify which files are relevant to your current task.
-
-Each reference file contains:
-
-- Brief explanation of why it matters
-- Incorrect CQL example with explanation
-- Correct CQL example with explanation
-- "When NOT to use" exceptions
-- Performance impact
 
 ## Comparison with SQL / MongoDB
 
@@ -114,3 +86,26 @@ CREATE KEYSPACE myapp_counters
   WITH replication = {'class': 'NetworkTopologyStrategy', 'replication_factor': 3}
   AND tablets = {'enabled': false};
 ```
+
+## Quick Reference
+
+Each reference explains why the rule matters, shows incorrect and correct CQL, and lists when the rule does not apply.
+
+### 1. Anti-Patterns — 5 rules
+
+- [antipattern-allow-filtering](references/antipattern-allow-filtering.md) — `ALLOW FILTERING` forces a full-scan. Consult this reference whenever you see it in a query, or when a query does not include the full partition key.
+- [antipattern-large-partitions](references/antipattern-large-partitions.md) — Partitions that grow without bounds cause hot shards, slow reads, and slow repair and streaming. Consult when designing time-series tables or any table where rows accumulate per partition key.
+- [antipattern-hot-partitions](references/antipattern-hot-partitions.md) — Uneven partition key distribution causes some nodes/shards to be overloaded while others sit idle. Consult when choosing partition keys for high-write workloads.
+- [antipattern-unpaged-queries](references/antipattern-unpaged-queries.md) — Unpaged SELECTs cause unbounded memory growth and cluster instability. Consult when a query may return more rows than a single page, or when reviewing code that calls raw/unpaged execution methods.
+- [antipattern-multi-partition-batch](references/antipattern-multi-partition-batch.md) — BATCH statements spanning multiple partitions provide no real atomicity benefit and create coordinator hotspots. Consult when reviewing code that uses BATCH to simulate a transaction, or when migrating SQL transaction logic to CQL.
+
+### 2. Fundamentals — 3 rules
+
+- [query-first-design](references/query-first-design.md) — Design tables from queries, not entities. The methodology for translating application access patterns into CQL table definitions. Consult when starting a new schema or converting a relational or document model into tables.
+- [partition-key-design](references/partition-key-design.md) — How to choose partition keys that distribute data evenly and support your queries. Includes composite partition keys. Consult when choosing or reviewing a partition key, or when a single column does not give enough cardinality.
+- [clustering-columns](references/clustering-columns.md) — How clustering columns control sort order within a partition, and how to use them for range queries and time-ordered data. Consult when a query needs sorted results, a range condition, or `WITH CLUSTERING ORDER BY`.
+
+### 3. Patterns — 2 rules
+
+- [pattern-bucketing](references/pattern-bucketing.md) — Split unbounded partitions into bounded time buckets (e.g., one partition per day/hour). Essential for time-series and IoT data. Consult when rows accumulate per partition key without a limit.
+- [secondary-indexes-and-mv](references/secondary-indexes-and-mv.md) — When to use secondary indexes, local secondary indexes, and materialized views — and when to prefer a denormalized table instead. Consult when a query filters on a column outside the primary key, or before adding `CREATE INDEX` or `CREATE MATERIALIZED VIEW`.

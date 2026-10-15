@@ -38,14 +38,6 @@ docker run --name scylla -d -p 8000:8000 scylladb/scylla:latest \
 
 By default this has no authentication enabled; any signed or unsigned request is honored. Do not leave a cluster this way outside of local testing — see `references/connecting-and-load-balancing.md` for real authentication and load-balancing setup.
 
-## Quick Reference
-
-### Reference Files — 3
-
-- [write-isolation-policies](references/write-isolation-policies.md) — The four write isolation policies, what each one costs and protects against, and which to recommend by default. Consult when configuring a new Alternator-enabled cluster or reviewing why an existing one is slow or inconsistent under concurrent writes.
-- [connecting-and-load-balancing](references/connecting-and-load-balancing.md) — Why Alternator has no single endpoint the way DynamoDB does, how authentication maps to CQL roles, and how to discover nodes for client-side load balancing. Consult before pointing any DynamoDB SDK client at a real (non-single-node-test) ScyllaDB cluster.
-- [compatibility-differences](references/compatibility-differences.md) — Behavioral differences from real DynamoDB that can silently change application behavior when porting code: consistency mapping, scan ordering, batch limits, attribute storage, tablets, and table deletion. Consult when migrating an existing DynamoDB application rather than building new against Alternator.
-
 ## Local Testing
 
 ```bash
@@ -69,3 +61,11 @@ dynamodb = boto3.resource(
 ## Vector Search Extension
 
 ScyllaDB Cloud offers an Alternator-specific extension for approximate nearest neighbor (ANN) search directly on DynamoDB-style item attributes, requiring no additional client library. If the user is doing similarity search through the DynamoDB API rather than CQL, point them to this rather than assuming they need to switch to a CQL client to get vector search.
+
+## Quick Reference
+
+### Reference Files — 3
+
+- [write-isolation-policies](references/write-isolation-policies.md) — The four write isolation policies, what each one costs and protects against, and which to recommend by default. Consult when configuring a new Alternator-enabled cluster or reviewing why an existing one is slow or inconsistent under concurrent writes.
+- [connecting-and-load-balancing](references/connecting-and-load-balancing.md) — Why Alternator has no single endpoint the way DynamoDB does, how authentication maps to CQL roles, and how to discover nodes for client-side load balancing. Consult before pointing any DynamoDB SDK client at a real (non-single-node-test) ScyllaDB cluster.
+- [compatibility-differences](references/compatibility-differences.md) — Behavioral differences from real DynamoDB that can silently change application behavior when porting code: consistency mapping, scan ordering, batch limits, attribute storage, tablets, and table deletion. Consult when migrating an existing DynamoDB application rather than building new against Alternator.

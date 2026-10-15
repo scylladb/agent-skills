@@ -5,6 +5,18 @@ impactDescription: Manual overrides that fight the Operator's own management, or
 tags: kubernetes, scyllacluster, replication-factor, affinity, resources
 ---
 
+## Contents
+
+- [The Full Template: `datacenter` → `racks` → `members`](#the-full-template-datacenter--racks--members)
+- [Custom `scylla.yaml` via `scyllaConfig`](#custom-scyllayaml-via-scyllaconfig)
+- [Racks Map to Replication Factor, Not to Convenience](#racks-map-to-replication-factor-not-to-convenience)
+- [Pod Anti-Affinity: One ScyllaDB Pod Per Node](#pod-anti-affinity-one-scylladb-pod-per-node)
+- [Resources: Two Separate Blocks, Easy to Forget One](#resources-two-separate-blocks-easy-to-forget-one)
+- [Other Fields Worth Setting Deliberately](#other-fields-worth-setting-deliberately)
+- [Scaling: Change `members`, Don't Recreate](#scaling-change-members-dont-recreate)
+- [Multi-Datacenter: `externalSeeds` and a Shared Cluster Identity](#multi-datacenter-externalseeds-and-a-shared-cluster-identity)
+- [Tablets Change How Racks and Repair Behave](#tablets-change-how-racks-and-repair-behave)
+
 ## The Full Template: `datacenter` → `racks` → `members`
 
 The single-node manifest in the Operator's getting-started docs is deliberately minimal, it exists to prove the Operator works, not to model a real deployment. A production `ScyllaCluster` is a three-level topology: one `datacenter` (a Kubernetes region), containing multiple `racks` (each pinned to a distinct availability zone), each with `members` (the number of ScyllaDB nodes in that rack). Total node count is `racks × members`, and members should be equal across racks so token ownership stays balanced.
