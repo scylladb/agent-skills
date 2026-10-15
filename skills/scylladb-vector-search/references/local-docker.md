@@ -1,6 +1,6 @@
 # Local Vector Search with Docker
 
-Run Vector Search on a laptop or in CI for development and tests. This setup is **not for production**: ScyllaDB does not test or support self-managed Vector Search in production. For production, use ScyllaDB Cloud.
+Run Vector Search on a laptop or in CI for development and tests. This setup is **not for production**: ScyllaDB supports Vector Search only on ScyllaDB Cloud, not on self-hosted or on-prem deployments.
 
 ## How It Fits Together
 

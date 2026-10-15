@@ -27,7 +27,7 @@ For adjacent topics, use the sibling skill instead:
 
 ## Where Vector Search Runs
 
-- **Production: ScyllaDB Cloud only.** Self-managed Vector Search is not tested or supported for production. If the user plans a self-managed production deployment, tell them it requires ScyllaDB Cloud with Vector Search enabled.
+- **Production: ScyllaDB Cloud only.** Vector Search runs on dedicated indexing nodes that ScyllaDB Cloud manages and syncs from the storage nodes through CDC. Self-hosted and on-prem deployments are not supported. If the user plans one of these for production, tell them that Vector Search requires a standard ScyllaDB Cloud cluster with Vector Search enabled.
 - **Development and testing: local Docker.** Run a ScyllaDB container plus a separate `scylladb/vector-store` container (the indexing service) connected to it. See [local-docker](references/local-docker.md).
 
 ## Core Principles
