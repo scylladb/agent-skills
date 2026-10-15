@@ -57,6 +57,8 @@ The skills follow the [Agent Skills format](https://agentskills.io).
 
 ## Development
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution process and [AGENTS.md](AGENTS.md) for the skill authoring rules. AI coding agents read `AGENTS.md` (Claude Code reads it through `CLAUDE.md`).
+
 ### Validating skills locally
 
 Install the validator (requires [Go](https://go.dev/doc/install)):
