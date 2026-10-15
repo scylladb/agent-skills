@@ -21,7 +21,7 @@ claude mcp add --transport http scylladb-cloud https://mcp.cloud.scylladb.com \
   --header "Authorization: Bearer ${SCYLLADB_CLOUD_API_TOKEN}"
 ```
 
-The default `local` scope stores the token in `~/.claude.json`, outside the repository. Do not use `--scope project`: it writes the token to `.mcp.json` in the repository.
+The default `local` scope stores the token in `~/.claude.json`.
 
 ## Keep the Token out of Git
 
