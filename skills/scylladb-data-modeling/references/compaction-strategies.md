@@ -25,6 +25,21 @@ CREATE TABLE myapp.user_profiles (
 ) WITH compaction = {'class': 'IncrementalCompactionStrategy'};
 ```
 
+### ICS space amplification goal
+
+Like STCS, ICS can keep overwritten, deleted, and expired data in smaller tiers for a long time. To limit this, set `space_amplification_goal`. When (largest tier + second-largest tier) / largest tier is more than the goal, ICS compacts the two largest tiers together. The option is off by default. See [ICS options](https://docs.scylladb.com/manual/stable/cql/compaction.md#ics-options).
+
+```
+ALTER TABLE myapp.user_profiles
+  WITH compaction = {'class': 'IncrementalCompactionStrategy',
+                     'space_amplification_goal': 1.25};
+```
+
+- Use it on update-heavy or overwrite-heavy ICS tables when disk space is the constraint.
+- Use a value greater than 1.0 and not more than 2.0. The docs give only the lower limit. ScyllaDB rejects values above 2.0 with a configuration error.
+- The docs give no recommended value. 1.25 is the docs example.
+- Each cross-tier compaction rewrites the largest tier. A lower value triggers it more often and increases write amplification. On a live table, the first one can start soon after the `ALTER`, so get the user's confirmation first.
+
 ### TWCS
 
 Use TWCS only when all of these hold. Otherwise use ICS.
