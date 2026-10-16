@@ -1,6 +1,6 @@
 ---
 name: scylladb-data-modeling
-description: ScyllaDB CQL data modeling patterns and anti-patterns, including compaction strategy choice, TTL-based expiration, and tombstone management. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, setting data retention, or troubleshooting performance issues caused by schema problems or deletes. Vector indexes go to scylladb-vector-search; DynamoDB API tables go to scylladb-alternator. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size", "TTL", "default_time_to_live", "compaction strategy", "TWCS", "gc_grace_seconds", "tombstone_gc".
+description: ScyllaDB CQL data modeling patterns and anti-patterns, including compaction strategy choice, TTL-based expiration, tombstone management, and lightweight transactions. Use when designing tables, reviewing schemas, migrating from SQL or MongoDB, setting data retention, or troubleshooting performance issues caused by schema problems or deletes, or writing conditional (LWT) statements. Vector indexes go to scylladb-vector-search; DynamoDB API tables go to scylladb-alternator. Triggers on "design schema", "ScyllaDB data model", "partition key", "clustering column", "primary key", "CQL table design", "ALLOW FILTERING", "large partitions", "hot partitions", "query-first design", "secondary index", "materialized view", "schema review", "wide partition", "tombstones", "time series", "BATCH", "paging", "fetch size", "TTL", "default_time_to_live", "compaction strategy", "TWCS", "gc_grace_seconds", "tombstone_gc", "LWT", "lightweight transaction", "IF NOT EXISTS", "LOCAL_SERIAL".
 ---
 
 # ScyllaDB Data Modeling
@@ -22,6 +22,7 @@ CQL data modeling patterns and anti-patterns for ScyllaDB. Bad schema is the roo
 - Adding secondary indexes or materialized views
 - Choosing a compaction strategy, or setting TTLs and retention on a table
 - Reads slowed by deletes, expired data, or tombstone warnings
+- Writing conditional statements (`IF NOT EXISTS`, `IF EXISTS`, `IF <condition>`) or choosing serial consistency
 
 For adjacent topics, use the sibling skill instead:
 
@@ -112,10 +113,11 @@ Each reference explains why the rule matters, shows incorrect and correct CQL, a
 - [partition-key-design](references/partition-key-design.md) — How to choose partition keys that distribute data evenly and support your queries. Includes composite partition keys. Consult when choosing or reviewing a partition key, or when a single column does not give enough cardinality.
 - [clustering-columns](references/clustering-columns.md) — How clustering columns control sort order within a partition, and how to use them for range queries and time-ordered data. Consult when a query needs sorted results, a range condition, or `WITH CLUSTERING ORDER BY`.
 
-### 3. Patterns — 2 rules
+### 3. Patterns — 3 rules
 
 - [pattern-bucketing](references/pattern-bucketing.md) — Split unbounded partitions into bounded time buckets (e.g., one partition per day/hour). Essential for time-series and IoT data. Consult when rows accumulate per partition key without a limit.
 - [secondary-indexes-and-mv](references/secondary-indexes-and-mv.md) — When to use secondary indexes, local secondary indexes, and materialized views — and when to prefer a denormalized table instead. Consult when a query filters on a column outside the primary key, or before adding `CREATE INDEX` or `CREATE MATERIALIZED VIEW`.
+- [lwt](references/lwt.md) — Conditional statements, Paxos cost, serial consistency, atomic arithmetic (ScyllaDB 2026.3+), and differences from Cassandra LWT. Consult when a statement has an `IF` clause, when choosing `SERIAL` or `LOCAL_SERIAL`, when a conditional write times out, or when porting Cassandra LWT code that reads the result set.
 
 ### 4. Data Lifecycle — 3 rules
 
