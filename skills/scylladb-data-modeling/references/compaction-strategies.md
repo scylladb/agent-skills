@@ -36,8 +36,7 @@ ALTER TABLE myapp.user_profiles
 ```
 
 - Use it on update-heavy or overwrite-heavy ICS tables when disk space is the constraint.
-- Use a value greater than 1.0 and not more than 2.0. The docs give only the lower limit. ScyllaDB rejects values above 2.0 with a configuration error.
-- The docs give no recommended value. 1.25 is the docs example.
+- Use a value greater than 1.0 and not more than 2.0.
 - Each cross-tier compaction rewrites the largest tier. A lower value triggers it more often and increases write amplification. On a live table, the first one can start soon after the `ALTER`, so get the user's confirmation first.
 
 ### TWCS
