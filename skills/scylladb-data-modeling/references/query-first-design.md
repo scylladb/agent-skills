@@ -109,4 +109,4 @@ SELECT * FROM messages WHERE conversation_id = ? ORDER BY sent_at DESC;
 ### When NOT to Denormalize
 
 - **Very low-volume lookup tables** (e.g., configuration, feature flags) — a single table with simple lookups is fine
-- **When write consistency is critical** — denormalized writes to multiple tables are not atomic (consider using `BATCH` for single-partition atomicity, or LWT for linearizable single-partition operations)
+- **When write consistency is critical** — denormalized writes to multiple tables are not atomic (consider using `BATCH` for single-partition atomicity, or LWT for linearizable single-partition operations, see [lwt.md](lwt.md))
