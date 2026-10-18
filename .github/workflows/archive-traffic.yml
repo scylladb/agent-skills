@@ -1,0 +1,71 @@
+name: Archive Traffic
+
+# GitHub keeps traffic data for 14 days. This workflow saves a daily copy
+# to a private repo, because this repo is public.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: archive-traffic
+  cancel-in-progress: false
+
+env:
+  SOURCE_REPO: scylladb/agent-skills
+  ARCHIVE_REPO: scylladb/agentic-growth
+  ARCHIVE_DIR: data/traffic
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch traffic data
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/traffic"
+          cd "$RUNNER_TEMP/traffic"
+          gh api "repos/$SOURCE_REPO/traffic/clones?per=day" > clones.json
+          gh api "repos/$SOURCE_REPO/traffic/views?per=day" > views.json
+          gh api "repos/$SOURCE_REPO/traffic/popular/referrers" > referrers.json
+          gh api "repos/$SOURCE_REPO/traffic/popular/paths" > paths.json
+          jq -n \
+            --arg repo "$SOURCE_REPO" \
+            --arg fetched_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --slurpfile clones clones.json \
+            --slurpfile views views.json \
+            --slurpfile referrers referrers.json \
+            --slurpfile paths paths.json \
+            '{repo: $repo, fetched_at: $fetched_at, clones: $clones[0], views: $views[0], referrers: $referrers[0], paths: $paths[0]}' \
+            > snapshot.json
+
+      - name: Check out archive repo
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: ${{ env.ARCHIVE_REPO }}
+          token: ${{ secrets.TRAFFIC_TOKEN }}
+          path: archive
+
+      - name: Commit snapshot
+        working-directory: archive
+        run: |
+          set -euo pipefail
+          date="$(date -u +%F)"
+          mkdir -p "$ARCHIVE_DIR"
+          cp "$RUNNER_TEMP/traffic/snapshot.json" "$ARCHIVE_DIR/$date.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$ARCHIVE_DIR/$date.json"
+          if git diff --cached --quiet; then
+            echo "No change for $date."
+            exit 0
+          fi
+          git commit -m "Archive agent-skills traffic $date"
+          git pull --rebase
+          git push
