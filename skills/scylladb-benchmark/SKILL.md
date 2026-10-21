@@ -66,7 +66,7 @@ The user can change every default. A changed cluster or loader shape has no reci
 ## Core rules
 
 - **Never run a benchmark on a production cluster or production data.**
-- **Show the cost first.** Show the hourly cost of the cluster and the loaders, and the estimate for the test. Get approval before you create anything.
+- **Show the cost first.** Show the hourly cost of the cluster and the loaders. For the default recipe, give the time from the Timing row. Do not add a buffer to it. Get approval before you create anything.
 - **Use a private connection.** Create the cluster with `"broadcastType": "PRIVATE"` and connect the loaders through VPC peering. Use the public IP allowlist only if the user asks. Say that it is less secure and adds a network path that is not representative. Mark the report "public network path".
 - **Put one loader in each cluster AZ ID** and set `rack=<AZ ID>`. A rack-aware client sends requests to coordinators in its own zone ([network costs](https://www.scylladb.com/2023/11/08/network-costs-with-scylladb/)).
 - **Never run the loader on the user's laptop or on a cluster node** ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)).
