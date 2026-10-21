@@ -85,7 +85,7 @@ Set `CMD` and `POP` for `cs-step.sh` ([cassandra-stress-commands](cassandra-stre
 W="CMD='user profile=/profiles/carepet.yaml ops(insert=3,read_range=1)' POP='dist=uniform(1..10000)'"
 each "$W ~/cs-step.sh cp30000-warm 30000 100 1m"
 each "$W ~/cs-step.sh cp30000-1 30000 100 3m"; collect cp30000-1 30000
-each "$W ~/cs-step.sh cp30000-2 30000 100 3m"; collect cp30000-2 30000
+each "$W ~/cs-step.sh cp30000-2 30000 100 3m"; collect cp30000-2 30000   # only for a repeatability check
 ```
 
 - `ops(insert=3,read_range=1)` is the ratio of operations. Use the ratio that the user gave. Name each query from `queries`, and use `insert` for writes.

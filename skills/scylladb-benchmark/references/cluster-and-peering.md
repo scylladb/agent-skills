@@ -60,7 +60,7 @@ curl -s -X POST -H "$AUTH" -H 'content-type: application/json' "$API/pricing" --
   | jq -r '.items[0].pricing.estimates[] | select(.intervalCode == "PT1H") | .totalAmount'
 ```
 
-Multiply by the node count. Show the user the cluster cost, the loader cost, and the total for the planned duration. Wait for approval.
+Multiply by the node count. Show the user the hourly cost of the cluster and the loaders. Say that the cost continues until the resources are deleted. For the default recipe, give the time from the Timing row in [SKILL.md](../SKILL.md#default-recipe-fast-path). Wait for approval.
 
 ## Create the cluster
 

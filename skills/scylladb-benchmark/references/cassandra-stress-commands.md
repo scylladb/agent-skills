@@ -50,16 +50,16 @@ Populate has no rate limit. Its `Op rate` and `Latency mean` are the first measu
 
 ## Run at the target rate
 
-Warm up once, then measure twice. Discard the warm-up. The built-in warm-up of each run is only 50,000 operations, so it does not fill the cache. Set `-pop` on every read and mixed run. Without it, reads use `gaussian(1..1000000)`.
+Warm up once, then measure once. Discard the warm-up. The warm-up loads hot rows into the ScyllaDB cache, and it takes the stalls that can occur soon after populate. It also warms the cassandra-stress JVM on the loaders. The built-in warm-up of each run is only 50,000 operations, so it does not fill the cache. Set `-pop` on every read and mixed run. Without it, reads use `gaussian(1..1000000)`.
 
 ```sh
 TARGET=220000; T=400          # default recipe. For other targets, get T from results-and-report.md#plan-the-load
 each "~/cs-step.sh t$TARGET-warm $TARGET $T 1m"
 each "~/cs-step.sh t$TARGET-1 $TARGET $T 3m"; collect t$TARGET-1 $TARGET       # tell the user now
-each "~/cs-step.sh t$TARGET-2 $TARGET $T 3m"; collect t$TARGET-2 $TARGET
+each "~/cs-step.sh t$TARGET-2 $TARGET $T 3m"; collect t$TARGET-2 $TARGET       # only for a repeatability check
 ```
 
-`collect` is in [loader-helpers.sh](../scripts/loader-helpers.sh). When the first measured run is valid and its p99 is within the SLA, tell the user the rate and the p99 at once. Then finish the second run. For a user profile, set `CMD` and `POP` ([workload-profile](workload-profile.md#run-the-profile)). For a sizing decision, run 30 min or more, long enough for compactions ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)).
+`collect` is in [loader-helpers.sh](../scripts/loader-helpers.sh). When the measured run is valid and its p99 is within the SLA, tell the user the rate and the p99. Run `t$TARGET-2` only if the user asks for a repeatability check. For a user profile, set `CMD` and `POP` ([workload-profile](workload-profile.md#run-the-profile)). For a sizing decision, run 30 min or more, long enough for compactions ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)).
 
 ## Read the results
 
@@ -85,7 +85,7 @@ One stall of a few seconds sets the p99 of a short run. Report each stall with i
 Use a step search for a shape that has no recipe, or when the user asks for it.
 
 1. Start well below the populate rate. Use steps of equal size.
-2. For each step, run the warm-up and two measured runs. Do not populate again.
+2. For each step, run the warm-up and one measured run. Do not populate again.
 3. Stop at the first step where a run breaks the SLA or a validity rule ([results-and-report](results-and-report.md#validity-rules)).
 4. After a step that saturates the cluster, wait until compactions end in the Monitoring tab. Then go down one step.
 5. Report the highest step that passed every run. The [i8g blog](https://www.scylladb.com/2026/01/22/scylladb-cloud-on-aws-i8g-and-i8ge/) defines "max throughput under SLA" as the maximum rate at p99 below 10 ms.

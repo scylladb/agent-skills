@@ -5,7 +5,7 @@ tags: report, markdown, results table, reproducibility, cost, timeline, validity
 
 # Benchmark report template
 
-Write the report to `scylladb-benchmark-report.md` in the root of the user's project, unless the user gives another path. Fill every field from the API responses and the files in `~/results`. Write "unknown" for a value that you could not get, and say why. Copy `~/results` of each loader next to the report, for example to `scylladb-benchmark-results/`.
+Write the report to `scylladb-benchmark-report.md` in the root of the user's project, unless the user gives another path. Fill every field from the API responses and the files in `~/results`. Write "unknown" for a value that you could not get, and say why. Remove the spread table if each step has one run. Copy `~/results` of each loader next to the report, for example to `scylladb-benchmark-results/`.
 
 ## Template
 
