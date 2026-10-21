@@ -13,7 +13,7 @@
       "name": "scylladb",
       "displayName": "ScyllaDB Skills",
       "source": "./",
-      "description": "Official ScyllaDB skills bundle: ScyllaDB overview, Cloud setup, CQL data modeling, Vector Search, Alternator (DynamoDB API), Kubernetes, and Cloud MCP. Each skill is invoked independently by the agent when relevant.",
+      "description": "Official ScyllaDB skills bundle: ScyllaDB overview, Cloud setup, CQL data modeling, Vector Search, Alternator (DynamoDB API), Kubernetes, Cloud MCP, and benchmarks. Each skill is invoked independently by the agent when relevant.",
       "skills": "./skills/",
       "logo": "./assets/scylladb-logo-vertical.png",
       "category": "database",
@@ -32,7 +32,10 @@
         "dynamodb",
         "kubernetes",
         "scylladb operator",
-        "mcp"
+        "mcp",
+        "benchmark",
+        "load testing",
+        "cassandra-stress"
       ]
     }
   ]
