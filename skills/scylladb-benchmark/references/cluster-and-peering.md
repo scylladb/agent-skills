@@ -1,17 +1,40 @@
 ---
 title: Benchmark cluster and VPC peering through the Cloud API
-tags: cloud api, x cloud, scaling, instanceTypeIDs, availabilityZoneIdsOverride, cluster-preview, pricing, broadcastType, private, cidrBlock, vpc peering, allowCql, firewall, credentials
+tags: cloud api, api token, x cloud, scaling, instanceTypeIDs, availabilityZoneIdsOverride, cluster-preview, pricing, broadcastType, private, cidrBlock, vpc peering, allowCql, firewall, credentials
 ---
 
 # Benchmark cluster and VPC peering through the Cloud API
 
 These calls use the ScyllaDB Cloud REST API at `https://api.cloud.scylladb.com` ([OpenAPI spec](https://cloud.docs.scylladb.com/stable/_static/swagger.json)). The Cloud MCP server has no VPC peering tool ([MCP docs](https://cloud.docs.scylladb.com/stable/api-docs/mcp.md)), so use the REST API for the full flow.
 
-Contents: [IDs and prices](#look-up-ids-and-prices), [create](#create-the-cluster), [nodes and credentials](#read-the-nodes-and-the-credentials), [peering](#peer-the-loader-vpc), [options](#options), [delete](#delete-the-peering-and-the-cluster).
+Contents: [API token](#get-the-api-token), [IDs and prices](#look-up-ids-and-prices), [create](#create-the-cluster), [nodes and credentials](#read-the-nodes-and-the-credentials), [peering](#peer-the-loader-vpc), [options](#options), [delete](#delete-the-peering-and-the-cluster).
+
+## Get the API token
+
+Tell the user to do these steps. Do not ask for the token in the chat. The chat transcript keeps it.
+
+1. Create a personal token in **Settings > Personal Tokens** ([create a token](https://cloud.docs.scylladb.com/stable/api-docs/create-api-token.md)). Set a short expiration, for example 1 day. The default is *Never*.
+2. Give the token to the agent in one of these ways:
+   - Before you start the agent, run `export SCYLLADB_CLOUD_API_TOKEN=<token>`.
+   - If the agent runs already, add `.env` to `.gitignore`. Then write `SCYLLADB_CLOUD_API_TOKEN=<token>` in `.env` in the project root.
+3. Revoke the token in **Settings > Personal Tokens** after the cleanup.
+
+If the user pastes the token in the chat, tell the user to revoke it and create a new one. For other rules to keep the token out of git, use the `scylladb-cloud-mcp` skill.
+
+Check the token without printing it. A `200` means that the token works:
+
+```sh
+[ -f .env ] && { set -a; . ./.env; set +a; }
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $SCYLLADB_CLOUD_API_TOKEN" \
+  https://api.cloud.scylladb.com/account/default
+```
+
+Shell variables can be lost between commands. Load `.env` again in each command that calls the API.
 
 ## Look up IDs and prices
 
 ```sh
+[ -f .env ] && { set -a; . ./.env; set +a; }
 API=https://api.cloud.scylladb.com
 AUTH="Authorization: Bearer $SCYLLADB_CLOUD_API_TOKEN"
 RUN_ID=bench-$(date -u +%Y%m%d%H%M)        # names and tags every resource of this test

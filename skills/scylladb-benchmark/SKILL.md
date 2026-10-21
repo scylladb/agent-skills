@@ -79,18 +79,18 @@ The user can change every default. A changed cluster or loader shape has no reci
 
 ## Workflow
 
-1. **Ask the questions.** Get the API token in `SCYLLADB_CLOUD_API_TOKEN` ([create a token](https://cloud.docs.scylladb.com/stable/api-docs/create-api-token.md)). Record the start time.
+1. **Ask the questions and get the API token** in `SCYLLADB_CLOUD_API_TOKEN`. Do not ask for the token in the chat ([cluster-and-peering](references/cluster-and-peering.md#get-the-api-token)). Record the start time.
 2. **Show the plan and the cost, and get approval** ([cluster-and-peering](references/cluster-and-peering.md#look-up-ids-and-prices), [loader-vm-aws](references/loader-vm-aws.md#price-and-size)).
 3. **Create the cluster and the loaders at the same time.** Send the cluster request with fixed AZ IDs, then create the loader network and VMs in the same AZ IDs ([cluster-and-peering](references/cluster-and-peering.md#create-the-cluster), [loader-vm-aws](references/loader-vm-aws.md#create-the-loader-network)).
 4. **Peer the VPCs and prepare the loaders** when the cluster is ready. Source [loader-helpers.sh](scripts/loader-helpers.sh) ([cluster-and-peering](references/cluster-and-peering.md#peer-the-loader-vpc), [loader-vm-aws](references/loader-vm-aws.md#prepare-the-loaders)).
 5. **Copy the scripts, create the keyspace, and populate** from all loaders ([cassandra-stress-commands](references/cassandra-stress-commands.md)).
 6. **Warm up, then run at the target twice.** After the first valid run within the SLA, tell the user the rate and the p99 at once. Then finish the second run. If a run fails the SLA, repeat it once. If the repeat also fails, tell the user, and run a step search down from the target ([cassandra-stress-commands](references/cassandra-stress-commands.md#run-at-the-target-rate), [results-and-report](references/results-and-report.md)).
 7. **Write `scylladb-benchmark-report.md`** in the user's project with the fixed results table and the repeat data ([report-template](references/report-template.md)).
-8. **Ask the user if you can delete the infrastructure**: loaders, peering, VPC and network resources, key pair, and cluster. Delete only after the user says yes. If the user says no, print the exact cleanup commands ([loader-vm-aws](references/loader-vm-aws.md#clean-up), [cluster-and-peering](references/cluster-and-peering.md#delete-the-peering-and-the-cluster)).
+8. **Ask the user if you can delete the infrastructure**: loaders, peering, VPC and network resources, key pair, and cluster. Delete only after the user says yes. If the user says no, print the exact cleanup commands ([loader-vm-aws](references/loader-vm-aws.md#clean-up), [cluster-and-peering](references/cluster-and-peering.md#delete-the-peering-and-the-cluster)). In both cases, tell the user to revoke the API token after the cleanup.
 
 ## Quick Reference
 
-- [cluster-and-peering](references/cluster-and-peering.md) — Cloud API calls for IDs, free-trial types, prices, a pinned private X Cloud cluster with fixed AZ IDs, credentials, VPC peering, Standard and public options, reuse, and deletion. Consult before you call the Cloud API or when the loaders cannot reach port 9042.
+- [cluster-and-peering](references/cluster-and-peering.md) — The API token, Cloud API calls for IDs, free-trial types, prices, a pinned private X Cloud cluster with fixed AZ IDs, credentials, VPC peering, Standard and public options, reuse, and deletion. Consult before you call the Cloud API or when the loaders cannot reach port 9042.
 - [loader-vm-aws](references/loader-vm-aws.md) — AWS CLI commands for the tagged loader VPC and one loader in each AZ ID, loader price, and cleanup. Consult before you create or delete any AWS resource.
 - [cassandra-stress-commands](references/cassandra-stress-commands.md) — Script copy, keyspace, split populate, target runs, interval log, step search, and TLS. Consult before you run cassandra-stress, or when a run fails or prints no results.
 - [workload-profile](references/workload-profile.md) — How to turn the app schema and queries into a cassandra-stress YAML user profile, with an example. Consult when the user wants the workload of their app.
