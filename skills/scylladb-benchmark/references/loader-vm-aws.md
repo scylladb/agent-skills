@@ -55,8 +55,9 @@ Use AZ IDs (`use1-az2`), not AZ names. AWS maps AZ names to different AZ IDs in 
 ```sh
 AMI_ID=$(aws ec2 describe-images --owners amazon --filters 'Name=name,Values=al2023-ami-2023.*-kernel-*-x86_64' \
   Name=state,Values=available --query 'sort_by(Images,&CreationDate)[-1].ImageId' --output text)
+SCYLLA_IMAGE=scylladb/scylla:${SCYLLA_VERSION%.*}   # cqlsh of the cluster release
 printf '#!/bin/bash\ndnf install -y docker\nsystemctl enable --now docker\nusermod -aG docker ec2-user
-docker pull scylladb/cassandra-stress:4.0.0\ndocker pull scylladb/scylla:2026.3\n' > user-data.sh
+docker pull scylladb/cassandra-stress:4.0.0\ndocker pull %s\n' "$SCYLLA_IMAGE" > user-data.sh
 : > loaders.txt; i=0
 for AZ in $AZS; do
   SN=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.10.$((i+1)).0/24 --availability-zone-id $AZ \
@@ -86,8 +87,8 @@ NODES=$(jq -r '[.data.nodes[].privateIp] | join(",")' nodes.json)
 each 'cloud-init status --wait > /dev/null; docker images --format "{{.Repository}}:{{.Tag}}"'
 while read AZ IP I ID; do
   scp -q -i $RUN_ID.pem scylladb_password ec2-user@$IP:.scylladb_password
-  ssh -n -i $RUN_ID.pem ec2-user@$IP "chmod 600 ~/.scylladb_password; printf 'NODES=%s\nDC=%s\nRACK=%s\nLOADER=%s\nLOADERS=%s\nCS_IMAGE=scylladb/cassandra-stress:4.0.0\n' \
-    $NODES $DC $AZ $I $(wc -l < loaders.txt) > ~/bench.env"
+  ssh -n -i $RUN_ID.pem ec2-user@$IP "chmod 600 ~/.scylladb_password; printf 'NODES=%s\nDC=%s\nRACK=%s\nLOADER=%s\nLOADERS=%s\nCS_IMAGE=scylladb/cassandra-stress:4.0.0\nSCYLLA_IMAGE=%s\n' \
+    $NODES $DC $AZ $I $(wc -l < loaders.txt) $SCYLLA_IMAGE > ~/bench.env"
 done < loaders.txt
 each 'set -a; . ~/bench.env; for n in ${NODES//,/ }; do timeout 3 bash -c "</dev/tcp/$n/9042" && echo $n open || echo $n closed; done'
 ```

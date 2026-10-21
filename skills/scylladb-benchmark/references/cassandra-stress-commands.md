@@ -28,7 +28,7 @@ The cassandra-stress schema default is RF 1. Create the keyspace with `cqlsh` fr
 each 'umask 077; mkdir -p ~/.cassandra
 printf "[PlainTextAuthProvider]\nusername = scylla\npassword = %s\n" "$(cat ~/.scylladb_password)" > ~/.cassandra/credentials
 printf "[authentication]\ncredentials = /cass/credentials\n" > ~/.cassandra/cqlshrc
-echo "CQLSH=\"docker run --rm --network=host --user $(id -u):$(id -g) -e HOME=/tmp -v \$HOME/.cassandra:/cass:ro -v \$HOME/profiles:/profiles:ro --entrypoint cqlsh scylladb/scylla:2026.3 --cqlshrc /cass/cqlshrc\"" >> ~/bench.env'
+echo "CQLSH=\"docker run --rm --network=host --user $(id -u):$(id -g) -e HOME=/tmp -v \$HOME/.cassandra:/cass:ro -v \$HOME/profiles:/profiles:ro --entrypoint cqlsh \$SCYLLA_IMAGE --cqlshrc /cass/cqlshrc\"" >> ~/bench.env'
 L1=$(awk 'NR == 1 {print $2}' loaders.txt)
 ssh -i $RUN_ID.pem ec2-user@$L1 'set -a; . ~/bench.env; set +a; $CQLSH ${NODES%%,*} -e "
   CREATE KEYSPACE IF NOT EXISTS keyspace1 WITH replication = {'"'"'class'"'"': '"'"'NetworkTopologyStrategy'"'"', '"'"'$DC'"'"': 3};"'

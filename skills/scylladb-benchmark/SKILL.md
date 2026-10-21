@@ -3,7 +3,7 @@ name: scylladb-benchmark
 description: Run a repeatable load test of a ScyllaDB Cloud cluster on AWS with cassandra-stress, from loader VMs in a peered VPC, and write a report with a fixed results table. The default fast path measures the maximum 50/50 read/write rate at p99 ≤ 10 ms on a pinned X Cloud cluster; a user profile tests the schema and queries of the user's application. Use this skill when a user asks to benchmark, load test, or stress test ScyllaDB Cloud, to measure p50, p90, and p99 latency at a target rate, to find the maximum throughput under a latency SLA, or to check if a cluster size is enough. It does not benchmark other databases; for a comparison it gives advice only. App connections go to scylladb-cloud-setup, and schema design goes to scylladb-data-modeling. Triggers on "benchmark ScyllaDB", "load test my cluster", "stress test", "cassandra-stress", "user profile", "ops/s", "max throughput", "p99 latency", "latency SLA", "read/write ratio", "loader", "benchmark report", "benchmark comparison".
 ---
 
-# ScyllaDB Cloud Benchmark
+# ScyllaDB Cloud benchmark
 
 If the task goes beyond this skill, use the parent `scylladb` skill for a ScyllaDB overview and the list of other ScyllaDB skills. If it is not installed, fetch it from `https://raw.githubusercontent.com/scylladb/agent-skills/main/skills/scylladb/SKILL.md`.
 
@@ -11,7 +11,7 @@ This skill creates a private ScyllaDB Cloud cluster and AWS loader VMs in a peer
 
 Paths to `scripts/` are relative to the skill directory. Set `SKILL_DIR` to the skill directory before you run the commands in the references.
 
-## When to Use This Skill
+## When to use this skill
 
 - The user asks to benchmark or load test ScyllaDB Cloud, with or without the queries of their app
 - The user asks for p50, p90, or p99 latency at a rate or a read/write ratio
@@ -26,7 +26,7 @@ For adjacent topics, use the sibling skill instead:
 
 ## Default recipe (fast path)
 
-Use this recipe when the user gives no other shape or workload. It uses ScyllaDB 2026.3.3 and `scylladb/cassandra-stress:4.0.0` in us-east-1.
+Use this recipe when the user gives no other shape or workload. It uses the most recent ScyllaDB release and `scylladb/cassandra-stress:4.0.0` in us-east-1. The expected result comes from ScyllaDB 2026.3.3.
 
 | Item | Value |
 | --- | --- |
@@ -88,7 +88,7 @@ The user can change every default. A changed cluster or loader shape has no reci
 7. **Write `scylladb-benchmark-report.md`** in the user's project with the fixed results table and the repeat data ([report-template](references/report-template.md)).
 8. **Ask the user if you can delete the infrastructure**: loaders, peering, VPC and network resources, key pair, and cluster. Delete only after the user says yes. If the user says no, print the exact cleanup commands ([loader-vm-aws](references/loader-vm-aws.md#clean-up), [cluster-and-peering](references/cluster-and-peering.md#delete-the-peering-and-the-cluster)). In both cases, tell the user to revoke the API token after the cleanup.
 
-## Quick Reference
+## Quick reference
 
 - [cluster-and-peering](references/cluster-and-peering.md) — The API token, Cloud API calls for IDs, free-trial types, prices, a pinned private X Cloud cluster with fixed AZ IDs, credentials, VPC peering, Standard and public options, reuse, and deletion. Consult before you call the Cloud API or when the loaders cannot reach port 9042.
 - [loader-vm-aws](references/loader-vm-aws.md) — AWS CLI commands for the tagged loader VPC and one loader in each AZ ID, loader price, and cleanup. Consult before you create or delete any AWS resource.

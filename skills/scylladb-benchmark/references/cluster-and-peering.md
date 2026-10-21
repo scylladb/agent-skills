@@ -42,7 +42,9 @@ REGION=us-east-1; TYPE=i4i.2xlarge
 ACCOUNT_ID=$(curl -s -H "$AUTH" "$API/account/default" | jq -r .data.accountId)
 REGION_ID=$(curl -s -H "$AUTH" "$API/deployment/cloud-provider/1/regions" \
   | jq -r ".data.regions[] | select(.externalId == \"$REGION\") | .id")       # AWS is provider 1
-VERSION_ID=$(curl -s -H "$AUTH" "$API/deployment/scylla-versions?defaults=true" | jq -r .data.defaultScyllaVersionId)
+read VERSION_ID SCYLLA_VERSION < <(curl -s -H "$AUTH" "$API/deployment/scylla-versions" | jq -r '[.data.scyllaVersions[]
+  | select(.newCluster == "ENABLED" and (.version | test("^[0-9]+\\.[0-9]+\\.[0-9]+$")))]
+  | max_by(.version | split(".") | map(tonumber)) | "\(.id) \(.version)"')   # most recent release
 curl -s -H "$AUTH" "$API/deployment/cloud-provider/1/region/$REGION_ID" > instances.json
 TYPE_ID=$(jq -r ".data.instances[] | select(.externalId == \"$TYPE\") | .id" instances.json)
 VCPU_MIN=$((3 * $(jq -r ".data.instances[] | select(.externalId == \"$TYPE\") | .cpuCount" instances.json)))
