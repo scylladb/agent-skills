@@ -35,9 +35,9 @@ Use this recipe when the user gives no other shape or workload. It uses the most
 | Data | 20,000,000 rows of the default `standard1` row, split across the loaders |
 | Workload | `mixed ratio(write=1,read=1)`, `cl=LOCAL_QUORUM`, `-pop dist=uniform(1..20000000)` |
 | Target | 220,000 ops/s in total: `-rate threads=400 fixed=73333/s` on each loader |
-| Timing | Populate with 300 threads on each loader, 1 min warm-up, 2 measured runs of 3 min. About 16 min from the cluster create request to the first result. |
+| Timing | Populate with 300 threads on each loader, 1 min warm-up, 1 measured run of 3 min. About 16 min from the cluster create request to the first result. |
 | SLA | p99 ≤ 10 ms |
-| Expected | 220,000 ops/s at p99 about 5 ms, 0 errors, loader CPU below 20%. 240,000 ops/s breaks the 10 ms SLA. |
+| Expected | 220,000 ops/s at p99 about 5 ms, 0 errors, loader CPU below 20%. |
 
 ## Select the test
 
@@ -58,7 +58,8 @@ Ask all of these in one message. Give the default with each question.
 2. SLA. Default: p99 ≤ 10 ms, the SLA of the [i8g benchmark](https://www.scylladb.com/2026/01/22/scylladb-cloud-on-aws-i8g-and-i8ge/).
 3. AWS region and AWS CLI profile. Default: us-east-1, the region of the recipe.
 4. Reuse a cluster that has a private connection? Default: no, create a new one.
-5. Change other items of the recipe: cluster type or size, loaders, target rate, or the public network path? Default: no change.
+5. Run the target a second time to check that the result repeats? Default: no, one run.
+6. Change other items of the recipe: cluster type or size, loaders, target rate, or the public network path? Default: no change.
 
 The user can change every default. A changed cluster or loader shape has no recipe. For it, run a step search.
 
@@ -72,7 +73,7 @@ The user can change every default. A changed cluster or loader shape has no reci
 - **Use `scylladb/cassandra-stress:4.0.0`.** It ships the shard-aware ScyllaDB Java driver 3.11.5.20 and uses token-aware routing and prepared statements ([source](https://github.com/scylladb/cassandra-stress)).
 - **Create the keyspace yourself** with `NetworkTopologyStrategy`, the DC name, and RF 3, and set `cl=LOCAL_QUORUM` ([production readiness](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/production-readiness.md)). The cassandra-stress defaults are RF 1 and `LOCAL_ONE` ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)).
 - **Keep loader CPU at or below 50%** ([benchmarking tutorial](https://github.com/scylladb/scylladb/wiki/Benchmarking-Tutorial)).
-- **Measure each rate at least twice** ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)). Merge percentiles. Do not average them.
+- **Measure each rate once.** Measure it a second time only if the user asks for a repeatability check. Merge the percentiles of the loaders. Do not average them.
 - **Report no number without evidence** from a `.out`, `.hdr`, or `.vmstat` file in `~/results`.
 - **Never print, log, or commit the CQL password or the API token.**
 - **Tag every AWS resource** with `scylladb-benchmark=<run-id>`.
@@ -84,8 +85,8 @@ The user can change every default. A changed cluster or loader shape has no reci
 3. **Create the cluster and the loaders at the same time.** Send the cluster request with fixed AZ IDs, then create the loader network and VMs in the same AZ IDs ([cluster-and-peering](references/cluster-and-peering.md#create-the-cluster), [loader-vm-aws](references/loader-vm-aws.md#create-the-loader-network)).
 4. **Peer the VPCs and prepare the loaders** when the cluster is ready. Source [loader-helpers.sh](scripts/loader-helpers.sh) ([cluster-and-peering](references/cluster-and-peering.md#peer-the-loader-vpc), [loader-vm-aws](references/loader-vm-aws.md#prepare-the-loaders)).
 5. **Copy the scripts, create the keyspace, and populate** from all loaders ([cassandra-stress-commands](references/cassandra-stress-commands.md)).
-6. **Warm up, then run at the target twice.** After the first valid run within the SLA, tell the user the rate and the p99 at once. Then finish the second run. If a run fails the SLA, repeat it once. If the repeat also fails, tell the user, and run a step search down from the target ([cassandra-stress-commands](references/cassandra-stress-commands.md#run-at-the-target-rate), [results-and-report](references/results-and-report.md)).
-7. **Write `scylladb-benchmark-report.md`** in the user's project with the fixed results table and the repeat data ([report-template](references/report-template.md)).
+6. **Warm up, then run at the target once.** Tell the user the rate and the p99. If the user asked for a repeatability check, run the target a second time. If a run fails the SLA, repeat it once. If the repeat also fails, tell the user, and run a step search down from the target ([cassandra-stress-commands](references/cassandra-stress-commands.md#run-at-the-target-rate), [results-and-report](references/results-and-report.md)).
+7. **Write `scylladb-benchmark-report.md`** in the user's project with the fixed results table ([report-template](references/report-template.md)).
 8. **Ask the user if you can delete the infrastructure**: loaders, peering, VPC and network resources, key pair, and cluster. Delete only after the user says yes. If the user says no, print the exact cleanup commands ([loader-vm-aws](references/loader-vm-aws.md#clean-up), [cluster-and-peering](references/cluster-and-peering.md#delete-the-peering-and-the-cluster)). In both cases, tell the user to revoke the API token after the cleanup.
 
 ## Quick reference

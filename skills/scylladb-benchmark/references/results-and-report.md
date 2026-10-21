@@ -44,7 +44,7 @@ Mark a run invalid, and say why in the report, if one of these is true:
 
 A run through the public IP allowlist can be valid. Mark it "public network path" in the report.
 
-For each step, give the spread of the runs: `(max − min) / min` of the measured rate and of p99. If the runs differ, find the cause before you report the step. Old data from an earlier test is one cause ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)). A run soon after populate can fail on stalls, so repeat a failed run once.
+If you measured a step more than once, give the spread of the runs: `(max − min) / min` of the measured rate and of p99. If the runs differ, find the cause before you report the step. Old data from an earlier test is one cause ([benchmark tips](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/benchmark-tips.md)). A run soon after populate can fail on stalls, so repeat a failed run once.
 
 ## Client-side and server-side latency
 
