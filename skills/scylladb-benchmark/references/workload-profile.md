@@ -23,7 +23,7 @@ Test the tables on the hot path only. A profile has one table. For two hot table
 
 ## Write the profile
 
-This profile was built from the [care-pet](https://github.com/scylladb/care-pet) Go app (`cpp/data/care-pet-ddl.cql`, `go/handler/avg.go`, `go/cmd/sensor/pet.go`) and run on 2026-10-20:
+This profile was built from the [care-pet](https://github.com/scylladb/care-pet) Go app (`cpp/data/care-pet-ddl.cql`, `go/handler/avg.go`, `go/cmd/sensor/pet.go`):
 
 ```yaml
 keyspace: carepet

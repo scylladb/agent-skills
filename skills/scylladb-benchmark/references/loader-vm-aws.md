@@ -5,7 +5,7 @@ tags: aws cli, vpc, subnet, availability zone id, internet gateway, security gro
 
 # Loader VPC and VMs on AWS
 
-The developer machine needs only the AWS CLI, `curl`, `jq`, and `ssh`. These commands were run on 2026-10-20 in us-east-1. Every resource gets the tag `scylladb-benchmark=$RUN_ID`. Create one loader in each cluster AZ ID. Each loader sets `rack=<its AZ ID>`, so each node gets the coordinator work of one loader.
+The developer machine needs the AWS CLI, `curl`, `jq`, and `ssh`. Every resource gets the tag `scylladb-benchmark=$RUN_ID`. Create one loader in each cluster AZ ID. Each loader sets `rack=<its AZ ID>`, so each node gets the coordinator work of one loader.
 
 Contents: [price and size](#price-and-size), [network](#create-the-loader-network), [VMs](#create-the-loaders), [prepare](#prepare-the-loaders), [clean up](#clean-up).
 
@@ -19,9 +19,9 @@ aws pricing get-products --region us-east-1 --service-code AmazonEC2 --filters \
   --query 'PriceList[0]' --output text | jq -r '.terms.OnDemand[].priceDimensions[].pricePerUnit.USD'
 ```
 
-This needs `pricing:GetProducts`. If the call fails, take the price from the [EC2 on-demand pricing page](https://aws.amazon.com/ec2/pricing/on-demand/) and write the source in the report. On 2026-10-20, c7i.8xlarge in us-east-1 was 1.428 USD/hour.
+This needs `pricing:GetProducts`. If the call fails, take the price from the [EC2 on-demand pricing page](https://aws.amazon.com/ec2/pricing/on-demand/) and write the source in the report.
 
-Keep each loader at or below 50% CPU ([benchmarking tutorial](https://github.com/scylladb/scylladb/wiki/Benchmarking-Tutorial)). ScyllaDB's i8g benchmark used 4 × c7i.8xlarge ([i8g blog](https://www.scylladb.com/2026/01/22/scylladb-cloud-on-aws-i8g-and-i8ge/)). The CPU of each loader in this skill's measured run is in [report-template](report-template.md#measured-run).
+Keep each loader at or below 50% CPU ([benchmarking tutorial](https://github.com/scylladb/scylladb/wiki/Benchmarking-Tutorial)). ScyllaDB's i8g benchmark used 4 × c7i.8xlarge ([i8g blog](https://www.scylladb.com/2026/01/22/scylladb-cloud-on-aws-i8g-and-i8ge/)).
 
 ## Create the loader network
 
@@ -48,7 +48,7 @@ aws ec2 create-key-pair --key-name $RUN_ID --key-type ed25519 \
 chmod 600 $RUN_ID.pem
 ```
 
-Use AZ IDs (`use1-az2`), not AZ names. AWS maps AZ names to different AZ IDs in each account. The internet gateway is for SSH and the image download only. CQL goes through the peering.
+Use AZ IDs (`use1-az2`), not AZ names. AWS maps AZ names to different AZ IDs in each account. The internet gateway is for SSH and the image download. CQL goes through the peering.
 
 ## Create the loaders
 
@@ -76,15 +76,12 @@ while read AZ ID I; do IP=$(aws ec2 describe-instances --instance-ids $ID \
 mv l.txt loaders.txt                      # columns: AZ ID, public IP, index, instance ID
 ```
 
-The user data pulls the images while the cluster starts. `ssm:GetParameter` on `/aws/service/ami-amazon-linux-latest/...` also gives the AMI, but not every IAM user has it.
-
 ## Prepare the loaders
 
-`each` runs one command on every loader at the same time. `ssh -n` keeps `ssh` from reading the `loaders.txt` loop input. Do not use `-n` when you send a file on stdin.
+[loader-helpers.sh](../scripts/loader-helpers.sh) defines `each` and `collect`. `each` runs one command on every loader at the same time. Source the file in each new shell. In a `while read` loop over `loaders.txt`, use `ssh -n`, or `ssh` reads the loop input. Do not use `-n` when you send a file on stdin.
 
 ```sh
-each() { while read AZ IP I ID; do ssh -n -i $RUN_ID.pem -o StrictHostKeyChecking=accept-new \
-  ec2-user@$IP "$1" | sed "s/^/[$AZ] /" & done < loaders.txt; wait; }
+. "$SKILL_DIR/scripts/loader-helpers.sh"
 NODES=$(jq -r '[.data.nodes[].privateIp] | join(",")' nodes.json)
 each 'cloud-init status --wait > /dev/null; docker images --format "{{.Repository}}:{{.Tag}}"'
 while read AZ IP I ID; do

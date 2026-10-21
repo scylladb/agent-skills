@@ -14,6 +14,7 @@ skills/
     SKILL.md              # required: frontmatter + instructions
     references/           # optional: detail loaded on demand
       <topic>.md
+    scripts/              # optional: executable helpers the skill runs
 .claude-plugin/           # Claude Code plugin + marketplace manifests
 .cursor-plugin/           # Cursor plugin + marketplace manifests
 tests/validate-skills.sh  # local validation
@@ -88,8 +89,8 @@ If the task goes beyond this skill, use the parent `scylladb` skill for a Scylla
 
 ## References
 
-- Put references in `references/` only. Do not create other directories (`docs/`, `examples/`, and so on) or extra files at the skill root such as `README.md`.
-- Link every reference file from SKILL.md. The validator flags unreachable files as orphans.
+- Put references in `references/` only. Put executable helper scripts in `scripts/` ([Agent Skills specification](https://agentskills.io/specification)). Do not create other directories (`docs/`, `examples/`, and so on) or extra files at the skill root such as `README.md`.
+- Link every reference file and every script from SKILL.md. The validator flags unreachable files as orphans.
 - Link one level deep: SKILL.md links to references. A reference may point to another reference in the same skill, but do not build chains the agent must follow to find basic information.
 - Keep each reference focused on one topic. Aim for 50-150 lines. Add a short table of contents at the top of files longer than that.
 - Use relative links (`references/filtering.md`), never absolute GitHub URLs.
