@@ -1,6 +1,6 @@
 ---
 name: scylladb-cloud-setup
-description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, set the default consistency level, size the connection pool, or troubleshoot connection issues. Cluster management through an AI agent goes to scylladb-cloud-mcp. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle", "shard-aware", "tablet-aware", "consistency level", "LOCAL_QUORUM", "too many connections".
+description: Guide users through connecting to a ScyllaDB Cloud cluster, choosing the correct driver and version, and configuring authentication. Use this skill when a user needs to connect to ScyllaDB Cloud, pick a CQL driver, check a driver version, configure credentials, set the default consistency level, choose consistency levels for replication factor 2, size the connection pool, or troubleshoot connection issues. Cluster management through an AI agent goes to scylladb-cloud-mcp. Triggers on "connect to ScyllaDB Cloud", "ScyllaDB connection", "ScyllaDB driver setup", "which driver", "driver version", "Java driver", "Python driver", "CQL connection", "DC-aware load balancing", "ScyllaDB credentials", "connection bundle", "shard-aware", "tablet-aware", "consistency level", "LOCAL_QUORUM", "LOCAL_ONE", "RF=2", "replication factor 2", "downgrading consistency", "too many connections".
 ---
 
 # ScyllaDB Cloud Connection Setup
@@ -14,6 +14,7 @@ This skill guides users through connecting their application to a ScyllaDB Cloud
 - The user needs to connect an application to a ScyllaDB Cloud cluster for the first time
 - The user asks which CQL driver to use for their language, or which driver version
 - The user is configuring credentials, contact points, DC-aware load balancing, or the default consistency level
+- The keyspace uses replication factor 2, or `LOCAL_QUORUM` fails while one node is down
 - The user asks why the driver opens so many connections, or wants to change the pool size
 - A connection to ScyllaDB Cloud fails or times out
 - The user is setting up IP allowlisting or VPC peering
@@ -95,6 +96,8 @@ Consult [driver-configuration](references/driver-configuration.md) for per-langu
 
 **Consistency level** — set `LOCAL_QUORUM` as the session default for reads and writes. ScyllaDB [recommends `LOCAL_QUORUM`](https://docs.scylladb.com/manual/stable/operating-scylla/procedures/tips/production-readiness.md) for single-DC and multi-DC clusters. In a single DC it waits for the same number of replicas as `QUORUM`. Driver defaults differ: Python, Java 4.x, and C# use `LOCAL_ONE`, gocql uses `QUORUM`, Rust uses `LOCAL_QUORUM`. Use `LOCAL_ONE` only for reads that can return stale data.
 
+**Replication factor 2** — with RF=2, `LOCAL_QUORUM` needs both replicas, so one node down makes every `LOCAL_QUORUM` request fail. Write at `LOCAL_QUORUM` with a downgrading retry policy and read at `LOCAL_ONE`. Consult [rf2-consistency](references/rf2-consistency.md).
+
 Consult [cloud-connection](references/cloud-connection.md) for details on IP allowlisting and VPC peering.
 
 ## Step 5: Test the Connection
@@ -129,3 +132,4 @@ Once connected, suggest relevant next steps:
 - [cloud-connection](references/cloud-connection.md) — Connection parameters, IP allowlisting, VPC peering, the Cloud datacenter naming convention, and common connection errors. Consult when a connection fails, or before allowlisting a client IP or setting up VPC peering.
 - [driver-configuration](references/driver-configuration.md) — Connection code for each ScyllaDB driver (Python, Java, Go, Rust, C#, Node.js, C++) with `PlainTextAuthProvider`, token-aware DC-aware load balancing, and `LOCAL_QUORUM`, plus connection pool notes. Consult when writing or reviewing the connection code for the user's language, or when the user asks about the number of connections.
 - [prepared-statements](references/prepared-statements.md) — Why prepared statements are required for token-aware and shard-aware routing, with incorrect and correct examples. Consult when the application runs the same query repeatedly, or when reviewing code that builds CQL strings at runtime.
+- [rf2-consistency](references/rf2-consistency.md) — Client consistency for keyspaces with replication factor 2: `LOCAL_QUORUM` writes with a downgrading retry policy and `LOCAL_ONE` reads, the policy in each driver, hints and repair after an outage, and rack lists with tablets. Consult when a keyspace has RF=2, or when `LOCAL_QUORUM` fails with `Unavailable` while one node is down.
