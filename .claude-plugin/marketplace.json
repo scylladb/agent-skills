@@ -9,7 +9,7 @@
     {
       "name": "scylladb",
       "source": "./",
-      "description": "Official Claude plugin for ScyllaDB (Skills). Connect to ScyllaDB Cloud, design CQL schemas, implement Vector Search, use the DynamoDB-compatible API (Alternator), run ScyllaDB on Kubernetes, manage clusters through the ScyllaDB Cloud MCP server, and benchmark ScyllaDB Cloud with cassandra-stress."
+      "description": "Official Claude plugin for ScyllaDB (Skills). Connect to ScyllaDB Cloud, design CQL schemas, implement Vector Search and full-text search, use the DynamoDB-compatible API (Alternator), run ScyllaDB on Kubernetes, manage clusters through the ScyllaDB Cloud MCP server, and benchmark ScyllaDB Cloud with cassandra-stress."
     }
   ]
 }
