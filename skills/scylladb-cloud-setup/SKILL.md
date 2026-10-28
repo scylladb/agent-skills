@@ -39,7 +39,7 @@ This is an interactive step-by-step guide. The agent detects the user's environm
 
 Ask the user to confirm they have a ScyllaDB Cloud cluster. If not, direct them to:
 
-1. Go to [cloud.scylladb.com](https://cloud.scylladb.com/) and log in (or sign up)
+1. Go to [cloud.scylladb.com](https://cloud.scylladb.com/?utm_source=agent-skills&utm_medium=coding-agent&utm_campaign=scylladb-cloud-setup) and log in (or sign up)
 2. Click **New Cluster** or **Free Trial**
 3. Choose AWS or GCP, configure region, instance type, and cluster name
 4. Whitelist their IP address
