@@ -66,4 +66,4 @@ Compaction turns expired cells into tombstones, or drops them directly once they
 ### When TTL Does Not Apply
 
 - **Data that must be deleted on demand** (a GDPR erasure request, for example): use `DELETE`, and see [tombstones.md](tombstones.md) for the cost.
-- **Tables with a vector index**: vector indexes do not support TTL. See the `scylladb-vector-search` skill.
+- **Tables with a vector or full-text index**: cell-level TTL leaves expired rows in the index. Use [per-row TTL](https://docs.scylladb.com/manual/stable/cql/cql-extensions.md#cql-per-row-ttl). See the `scylladb-vector-search` skill.

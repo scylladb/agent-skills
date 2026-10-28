@@ -11,11 +11,11 @@ Vector Search needs two services, not one:
 | ScyllaDB | `scylladb/scylla` | Stores the table, accepts CQL, forwards ANN queries |
 | Vector Store | `scylladb/vector-store` | Builds and serves the HNSW index; reads changes from ScyllaDB through CDC |
 
-A `scylladb/scylla` container alone is not enough: without a connected Vector Store, vector indexes and ANN queries do not work.
+A `scylladb/scylla` container alone is not enough: without a connected Vector Store, vector and full-text queries fail with `Vector Store is disabled`.
 
 ## Start the Stack
 
-Use the Docker Compose file maintained in the Vector Store repo. It pins a ScyllaDB version that works with the current Vector Store release:
+Use the Docker Compose file maintained in the Vector Store repo. It pins a ScyllaDB version that works with the current Vector Store release for Vector Search:
 
 ```sh
 curl -sLO https://raw.githubusercontent.com/scylladb/vector-store/master/docs/examples/docker/docker-compose.yml
@@ -23,6 +23,8 @@ docker compose up -d
 ```
 
 CQL is on `localhost:9042`. Connect with no credentials and local DC `datacenter1`.
+
+For full-text search, check the `scylladb/scylla` tag in the file. Full-text search needs ScyllaDB 2026.3.0 or later. If the file pins an older version, change the tag before `docker compose up`. The `scylladb/vector-store:latest` image serves full-text indexes.
 
 ## Wiring a Custom Setup
 
@@ -43,7 +45,7 @@ CREATE KEYSPACE IF NOT EXISTS myapp
 WITH replication = {'class': 'NetworkTopologyStrategy', 'replication_factor': 1};
 ```
 
-Tablets are enabled by default, which Vector Search requires (see [vector-type-and-indexing](vector-type-and-indexing.md)). Then follow the normal workflow: create the table, create the vector index, insert vectors, run ANN queries.
+Tablets are enabled by default, which vector and full-text indexes require (see [vector-type-and-indexing](vector-type-and-indexing.md)). Then follow the normal workflow: create the table, create the vector index, insert vectors, run ANN queries.
 
 ## Limitations
 

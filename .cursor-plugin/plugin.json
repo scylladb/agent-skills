@@ -1,7 +1,7 @@
 {
   "name": "scylladb",
   "version": "1.0.0",
-  "description": "Official ScyllaDB agent skills. Bundles a ScyllaDB overview skill and guided skills for ScyllaDB Cloud setup, CQL data modeling, Vector Search, the DynamoDB-compatible API (Alternator), ScyllaDB on Kubernetes, the ScyllaDB Cloud MCP server, and benchmarks of ScyllaDB Cloud; each is invoked independently by the agent when relevant.",
+  "description": "Official ScyllaDB agent skills. Bundles a ScyllaDB overview skill and guided skills for ScyllaDB Cloud setup, CQL data modeling, Vector Search and full-text search, the DynamoDB-compatible API (Alternator), ScyllaDB on Kubernetes, the ScyllaDB Cloud MCP server, and benchmarks of ScyllaDB Cloud; each is invoked independently by the agent when relevant.",
   "author": {
     "name": "ScyllaDB",
     "email": "support@scylladb.com"
@@ -19,6 +19,7 @@
     "scylladb cloud",
     "data modeling",
     "vector search",
+    "full-text search",
     "semantic search",
     "rag",
     "alternator",

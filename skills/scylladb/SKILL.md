@@ -1,6 +1,6 @@
 ---
 name: scylladb
-description: Overview of ScyllaDB and a map of the ScyllaDB agent skills, with instructions to install or fetch a skill that is missing. Use this skill when starting a project on ScyllaDB or moving an existing project to ScyllaDB, when a task covers more than one ScyllaDB area, or when no more specific ScyllaDB skill matches. Child skill scylladb-data-modeling wins for CQL schemas, keys, indexes, TTL, and compaction. Child skill scylladb-cloud-setup wins for connections, drivers, and credentials. Also use to find the skill for vector search, the DynamoDB API (Alternator), Kubernetes and the ScyllaDB Operator, the ScyllaDB Cloud MCP server, or benchmarks and load tests of ScyllaDB Cloud. Triggers on "ScyllaDB", "Scylla", "ScyllaDB Cloud", "get started with ScyllaDB", "use ScyllaDB", "migrate to ScyllaDB", "switch to ScyllaDB".
+description: Overview of ScyllaDB and a map of the ScyllaDB agent skills, with instructions to install or fetch a skill that is missing. Use this skill when starting a project on ScyllaDB or moving an existing project to ScyllaDB, when a task covers more than one ScyllaDB area, or when no more specific ScyllaDB skill matches. Child skill scylladb-data-modeling wins for CQL schemas, keys, indexes, TTL, and compaction. Child skill scylladb-cloud-setup wins for connections, drivers, and credentials. Also use to find the skill for vector, full-text, and hybrid search, the DynamoDB API (Alternator), Kubernetes and the ScyllaDB Operator, the ScyllaDB Cloud MCP server, or benchmarks and load tests of ScyllaDB Cloud. Triggers on "ScyllaDB", "Scylla", "ScyllaDB Cloud", "get started with ScyllaDB", "use ScyllaDB", "migrate to ScyllaDB", "switch to ScyllaDB".
 ---
 
 # ScyllaDB
@@ -39,6 +39,7 @@ docker run --name scylla -d -p 9042:9042 scylladb/scylla --smp 1 --memory 1G
 ## Features
 
 - **Vector Search** — [ANN queries over vector columns](https://cloud.docs.scylladb.com/stable/vector-search/index.md). ScyllaDB Cloud only for production; runs locally in Docker for testing.
+- **Full-Text Search** — [BM25 keyword queries over text columns](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md), ScyllaDB 2026.3.0+. Runs on the same indexing nodes as Vector Search.
 
 ## Tools
 
@@ -59,7 +60,7 @@ When the task matches a row, work from that skill and not from this overview.
 | --- | --- |
 | `scylladb-cloud-setup` | Connecting to ScyllaDB Cloud, choosing a driver and version, credentials, connection problems. |
 | `scylladb-data-modeling` | Designing or reviewing CQL schemas, partition and clustering keys, secondary indexes, materialized views, TTL, tombstones, compaction. |
-| `scylladb-vector-search` | Embeddings, vector indexes, ANN queries, RAG on ScyllaDB Cloud. |
+| `scylladb-vector-search` | Embeddings, vector indexes, ANN queries, RAG, full-text search (BM25), hybrid search on ScyllaDB Cloud. |
 | `scylladb-alternator` | DynamoDB-compatible API, porting DynamoDB applications, boto3 and AWS SDK clients. |
 | `scylladb-kubernetes` | ScyllaDB Operator, ScyllaCluster, running ScyllaDB on Kubernetes. |
 | `scylladb-cloud-mcp` | Managing ScyllaDB Cloud clusters through the Cloud MCP server. |

@@ -112,8 +112,7 @@ VALUES (
 ### Unsupported Features with Vector Indexes
 
 - `ALTER INDEX` — cannot modify index options after creation; drop and recreate instead
-- TTL — creating a vector index on a table with `default_time_to_live` is rejected
-- Writes with TTL on a column with a vector index are ignored
+- Cell-level TTL (`USING TTL`, `default_time_to_live`) — accepted, but expired rows stay in the vector index and use slots against `LIMIT`. Use [per-row TTL](https://cloud.docs.scylladb.com/stable/vector-search/work-with-vector-search.md#vs-ttl) (ScyllaDB 2026.2.0+)
 - `DISTINCT`, `TOKEN`, `CONTAINS` operators are not supported in vector queries
 
 ### TRUNCATE Does Not Clear the Vector Index

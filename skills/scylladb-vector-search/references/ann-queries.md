@@ -105,4 +105,4 @@ LIMIT 10;
 - `CONTAINS` operator in vector queries
 - Filtering on columns not in the primary key (see `filtering.md` for supported filtering)
 - `ALTER INDEX` (must drop and recreate to change index options)
-- TTL on columns with a vector index
+- Cell-level TTL on tables with a vector index (use per-row TTL, see [vector-type-and-indexing](vector-type-and-indexing.md))
