@@ -1,66 +1,41 @@
 ---
 title: "Full-Text Search (BM25)"
-tags: full-text-search, BM25, fulltext_index, keyword-search, analyzer
+tags: full-text-search, BM25, fulltext_index, keyword-search, hybrid-search
 ---
 
 # Full-Text Search (BM25)
 
-Full-text search ranks rows by BM25 relevance from a `fulltext_index` on a text column. It needs ScyllaDB 2026.3.0 or later and runs on the same indexing nodes (the Vector Store) as Vector Search. Full guide: [Working with Full Text Search](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md).
+Full-text search needs ScyllaDB 2026.3.0 or later and the Vector Store (the same indexing nodes as Vector Search). Without a Vector Store, `CREATE CUSTOM INDEX ... USING 'fulltext_index'` succeeds, but queries fail with `Vector Store is disabled`. Read [Working with Full Text Search](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md) for the syntax.
 
-## Requirements
+## Rules
 
-- ScyllaDB Cloud: a cluster with Vector and Text Search enabled, on ScyllaDB 2026.3.0 or later ([deployments](https://cloud.docs.scylladb.com/stable/vector-search/vector-search-clusters.md)).
-- Locally: a connected Vector Store container (see [local-docker](local-docker.md)). Without one, `CREATE CUSTOM INDEX ... USING 'fulltext_index'` succeeds, but every query fails with `Vector Store is disabled`.
-- The column is `text`, `varchar` or `ascii`, and is not a partition key column. The keyspace uses tablets. CDC is enabled automatically.
+- Use this query shape only. ScyllaDB rejects all other shapes ([rules](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-queries)):
 
-## Query Shape
+  ```cql
+  SELECT id, body FROM blog.articles
+    WHERE BM25(body, ?) > 0 ORDER BY BM25(body, ?) LIMIT 10;
+  ```
 
-A full-text query has exactly one valid shape. ScyllaDB rejects every other shape ([rules and errors](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-queries)):
+- Bind the same value to both markers. `LIMIT` is 1000 at most, and results are not paged.
+- Do not add other `WHERE` restrictions, including the partition key. Filter in the application. A filter that removes most rows (for example, one small tenant in a large table) can leave no results. Tell the user.
+- Write `AND`, `OR`, `NOT` in uppercase. Lowercase `and` is a search term, so `a and b` silently means `a OR b`.
+- Sanitize end-user input. Characters such as `:` `[` `^` and quotes make the query fail, also with bind markers ([example](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-drivers)).
+- Select the [analyzer](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-analyzers) before you load data. It cannot change. The default `standard` analyzer does no stemming.
+- Use [per-row TTL](https://cloud.docs.scylladb.com/stable/vector-search/work-with-vector-search.md#vs-ttl), not `USING TTL`. Expired cells stay in the index and use slots against `LIMIT`.
 
-```cql
-SELECT id, body FROM blog.articles
-  WHERE BM25(body, 'search terms') > 0
-  ORDER BY BM25(body, 'search terms')
-  LIMIT 10;
+## Hybrid Search
+
+As of ScyllaDB 2026.3, `BM25()` and `ANN OF` cannot be in one query, and BM25 scores are not returned. Put both indexes on one table ([example](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-hybrid)). Run both queries and merge the primary keys by rank with Reciprocal Rank Fusion:
+
+```python
+def rrf(*ranked_lists, k=60):
+    scores = {}
+    for ranked in ranked_lists:
+        for rank, key in enumerate(ranked, start=1):
+            scores[key] = scores.get(key, 0.0) + 1.0 / (k + rank)
+    return sorted(scores, key=scores.get, reverse=True)
+
+keyword = [r.id for r in session.execute(bm25_stmt, (text, text, 10))]
+semantic = [r.id for r in session.execute(ann_stmt, (vector, 10))]
+top_ids = rrf(keyword, semantic)[:10]
 ```
-
-- Use the same column and the same term in `WHERE` and `ORDER BY`. In prepared statements, bind the same value to both markers.
-- `LIMIT` is required, with a maximum of 1000. Results are never paged.
-- Do not add other `WHERE` restrictions, including the partition key. `ALLOW FILTERING` does not help. Filter in the application after the query. Because of the `LIMIT` maximum, a filter that removes most rows (for example, one small tenant in a large table) can leave no results. Tell the user about this limit.
-- Do not put `BM25()` in the `SELECT` list. Scores are not returned as of 2026.3.
-
-Wrong, because these are rejected or are not full-text search:
-
-```cql
-SELECT * FROM blog.articles WHERE body LIKE '%distributed%';
-SELECT * FROM blog.articles WHERE tenant = 'a' AND BM25(body, 'x') > 0 ORDER BY BM25(body, 'x') LIMIT 10;
-SELECT id, BM25(body, 'x') AS score FROM blog.articles WHERE BM25(body, 'x') > 0 ORDER BY BM25(body, 'x') LIMIT 10;
-```
-
-## Query String Traps
-
-The `BM25()` string uses a [text query language](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-query-language), not CQL.
-
-- Write `AND`, `OR`, `NOT` in uppercase. Lowercase `and` is a term, so `distributed and apple` silently means `distributed OR apple`.
-- Separate terms without an operator are joined with `OR`.
-- Put phrases in double quotes inside the CQL string: `'"theory of relativity"'`. Phrases need `'positions': 'true'` (the default).
-- Do not rely on fuzzy (`term~1`) or prefix (`term*`) syntax.
-- Characters such as `:`, `[`, `{`, `^`, quotes and unbalanced parentheses make the query fail. Bind markers do not prevent this. Sanitize end-user input before the query, as in the [driver example](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-drivers).
-
-## Analyzer
-
-- Select the analyzer before you load data. It cannot change after creation. To change it, drop and create the index again, which rebuilds it.
-- The default `standard` analyzer removes English stop words and does no stemming. For stemming, or for text in another language, use a language analyzer such as `english` or `german` ([analyzers](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-analyzers)).
-
-```cql
-CREATE CUSTOM INDEX IF NOT EXISTS articles_body_fts ON blog.articles(body)
-  USING 'fulltext_index'
-  WITH OPTIONS = {'analyzer': 'english'};
-```
-
-## Index Build, Writes and TTL
-
-- After `CREATE CUSTOM INDEX`, queries fail with `404 ... missing index` and then `503 ... still being constructed` until the build completes. Retry until the query succeeds.
-- Writes become searchable a few seconds after the write. To read a write immediately, read the row by primary key.
-- Do not use cell-level TTL (`USING TTL`, `default_time_to_live`). Expired rows stay in the index and use slots against `LIMIT`, so queries can return fewer rows. Use [per-row TTL](https://cloud.docs.scylladb.com/stable/vector-search/work-with-vector-search.md#vs-ttl).
-- `TRUNCATE` does not clear the index, as for vector indexes (see [vector-type-and-indexing](vector-type-and-indexing.md)).
