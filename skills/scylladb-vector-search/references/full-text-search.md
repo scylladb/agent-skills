@@ -11,7 +11,7 @@ Full-text search needs ScyllaDB 2026.3.0 or later and the Vector Store (the same
 
 - Use this query shape only. ScyllaDB rejects all other shapes ([rules](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-queries)):
 
-  ```cql
+  ```sql
   SELECT id, body FROM blog.articles
     WHERE BM25(body, ?) > 0 ORDER BY BM25(body, ?) LIMIT 10;
   ```
@@ -25,9 +25,15 @@ Full-text search needs ScyllaDB 2026.3.0 or later and the Vector Store (the same
 
 ## Hybrid Search
 
-As of ScyllaDB 2026.3, `BM25()` and `ANN OF` cannot be in one query, and BM25 scores are not returned. Put both indexes on one table ([example](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-hybrid)). Run both queries and merge the primary keys by rank with Reciprocal Rank Fusion:
+As of ScyllaDB 2026.3, `BM25()` and `ANN OF` cannot be in one query, and BM25 scores are not returned. Put both indexes on one table ([example](https://cloud.docs.scylladb.com/stable/vector-search/full-text-search.md#fts-hybrid)). Run both queries and merge the primary keys by rank with Reciprocal Rank Fusion. Python, with an open `session`:
 
 ```python
+bm25 = session.prepare(
+    "SELECT id FROM blog.docs WHERE BM25(body, ?) > 0 ORDER BY BM25(body, ?) LIMIT ?"
+)
+ann = session.prepare("SELECT id FROM blog.docs ORDER BY embedding ANN OF ? LIMIT ?")
+
+
 def rrf(*ranked_lists, k=60):
     scores = {}
     for ranked in ranked_lists:
@@ -35,7 +41,9 @@ def rrf(*ranked_lists, k=60):
             scores[key] = scores.get(key, 0.0) + 1.0 / (k + rank)
     return sorted(scores, key=scores.get, reverse=True)
 
-keyword = [r.id for r in session.execute(bm25_stmt, (text, text, 10))]
-semantic = [r.id for r in session.execute(ann_stmt, (vector, 10))]
-top_ids = rrf(keyword, semantic)[:10]
+
+def hybrid_search(text, vector, limit=10):
+    keyword = [r.id for r in session.execute(bm25, (text, text, limit))]
+    semantic = [r.id for r in session.execute(ann, (vector, limit))]
+    return rrf(keyword, semantic)[:limit]
 ```
