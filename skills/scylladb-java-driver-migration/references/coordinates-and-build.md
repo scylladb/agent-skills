@@ -114,4 +114,4 @@ dependencies {
 
 ## Remove the Old Artifacts
 
-After the code compiles, remove every `scylla-driver-*` and `cassandra-driver-*` dependency, and any exclusion or version pin that existed only for them, such as Guava or Netty pins. Then rerun the inventory grep from SKILL.md; it must return nothing.
+After the code compiles, remove every `scylla-driver-*` and `cassandra-driver-*` dependency, and any exclusion or version pin that existed only for them, such as Guava or Netty pins. Then rerun the first two inventory greps from SKILL.md; they must return nothing. Guava imports may remain if the build now declares `com.google.guava:guava` itself.

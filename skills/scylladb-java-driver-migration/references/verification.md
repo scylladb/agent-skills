@@ -5,7 +5,7 @@ How to check a 3.x to 4.x migration before calling it done. A migration that com
 ## 1. Build Checks
 
 1. The project compiles with the 4.x artifacts and with the Java version from [coordinates-and-build](coordinates-and-build.md#java-version).
-2. The inventory grep from SKILL.md returns nothing.
+2. The first two inventory greps from SKILL.md return nothing. The Guava grep may still match if the build declares Guava directly; see [coordinates-and-build](coordinates-and-build.md#guava).
 3. The resolved dependency tree has no 3.x driver and no upstream 4.x driver:
 
 ```bash
@@ -30,7 +30,7 @@ docker exec scylla nodetool status   # wait until the node shows UN
 
 - The local datacenter of this container is `datacenter1`. Use it for `withLocalDatacenter` or `basic.load-balancing-policy.local-datacenter` in the test configuration only; keep the user's production value.
 - `--smp 2` gives the node two shards, so the shard-awareness check below has something to see.
-- Remove the container when done: `docker rm -f scylla`.
+- When done, ask the user before you remove the container with `docker rm -f scylla`.
 
 ## 3. Behavior Checks
 

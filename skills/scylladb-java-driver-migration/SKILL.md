@@ -23,7 +23,7 @@ For adjacent topics, use the sibling skill instead:
 
 ## Migration Workflow
 
-Follow these steps in order. Build after each step, and fix compile errors before you move on.
+Follow these steps in order. After each step, build and run the project's tests, and fix failures before you move on. Both drivers stay on the classpath until the code no longer needs 3.x (see [Remove the Old Artifacts](references/coordinates-and-build.md#remove-the-old-artifacts)), so every step can be tested on its own. Steps 4 to 7 can go one class or module at a time.
 
 1. **Inventory.** Find every 3.x usage before you edit anything, and show the user the counts:
 

@@ -93,4 +93,5 @@ UserDao dao = mapper.userDao();
 
 - `UserMapperBuilder` does not exist until the annotation processor runs. If the IDE reports it as missing, build the project first.
 - In `@Query`, use `${keyspaceId}`, `${tableId}`, or `${qualifiedTableId}` instead of a hard-coded keyspace, and named markers (`:ids`) that match the method's parameter names.
-- Port 3.x `@Accessor` queries as they are. If one uses `ALLOW FILTERING`, point it out to the user instead of rewriting it; see `scylladb-data-modeling`.
+- Port 3.x `@Accessor` query strings as they are, except the markers: replace each anonymous `?` with a named marker that matches the parameter name, for example `WHERE id = :userId` for `findById(UUID userId)`. 4.x binds `@Query` parameters by name, so a `?` works only when the parameter happens to have the column's name; otherwise the call fails at runtime with `IllegalArgumentException: userId is not a variable in this bound statement`. A 3.x `@Param("x")` becomes `@CqlName("x")` on the parameter.
+- If an `@Accessor` query uses `ALLOW FILTERING`, point it out to the user instead of rewriting it; see `scylladb-data-modeling`.

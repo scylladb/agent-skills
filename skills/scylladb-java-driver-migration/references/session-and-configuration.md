@@ -57,6 +57,7 @@ Options without a builder method go in `application.conf` on the classpath, unde
 | `...setSerialConsistencyLevel(cl)` | `basic.request.serial-consistency` |
 | `...setFetchSize(n)` | `basic.request.page-size` |
 | `...setDefaultIdempotence(b)` | `basic.request.default-idempotence` |
+| `...setLoadBalancingLwtRequestRoutingMethod(m)` | `advanced.load-balancing-policy.default-lwt-request-routing-method`, same values: `PRESERVE_REPLICA_ORDER` (the default in both) or `REGULAR` |
 | `withSocketOptions(...setConnectTimeoutMillis(ms))` | `advanced.connection.connect-timeout` |
 | `withSocketOptions(...setReadTimeoutMillis(ms))` | `basic.request.timeout`. It now covers the whole request, retries included; see SKILL.md. |
 | `withPoolingOptions(...)` | `advanced.connection.pool.local.size`, `advanced.connection.max-requests-per-connection` (see below) |
@@ -71,7 +72,7 @@ Options without a builder method go in `application.conf` on the classpath, unde
 | `withClusterName(name)` | `basic.session-name` |
 | `withProtocolVersion(v)` | Delete it. 4.x negotiates the version, also in mixed clusters. |
 | `withoutJMXReporting()`, `withoutMetrics()` | Delete them. Metrics are off by default in 4.x. |
-| `Host.StateListener`, `SchemaChangeListener` registered on `Cluster` | `withNodeStateListener(...)`, `withSchemaChangeListener(...)` on the builder |
+| `cluster.register(...)` with a `Host.StateListener` or `SchemaChangeListener` | `addNodeStateListener(...)`, `addSchemaChangeListener(...)` on the builder, once per listener. `withNodeStateListener` and `withSchemaChangeListener` replace any listener set before, so with several listeners only the last one would fire. |
 
 Speculative executions: in 3.x, `n` counts the extra executions. In 4.x, `max-executions` includes the first one, so add 1.
 

@@ -34,13 +34,10 @@ Positional values passed to `execute(String, Object...)` or `SimpleStatement.new
 
 ## Getter and Setter Renames
 
-These apply to `Row`, `BoundStatement`, `UdtValue`, and `TupleValue`. Setters follow the same names (`setInstant`, `setLocalDate`, and so on).
+The temporal getters follow the types above, as listed in [CQL to Java type mappings](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#cql-to-java-type-mappings). The guide does not list the other renames below. They apply to `Row`, `BoundStatement`, `UdtValue`, and `TupleValue`, and setters follow the same names (`setBigInteger`, `setUuid`, and so on).
 
 | 3.x | 4.x |
 | --- | --- |
-| `getTimestamp` | `getInstant` |
-| `getDate` | `getLocalDate` |
-| `getTime` | `getLocalTime` |
 | `getBytes` | `getByteBuffer` |
 | `getVarint` | `getBigInteger` |
 | `getDecimal` | `getBigDecimal` |
