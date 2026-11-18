@@ -61,7 +61,7 @@ Maven dependency:
 <dependency>
     <groupId>com.scylladb</groupId>
     <artifactId>java-driver-core</artifactId>
-    <version>4.19.2.2</version>
+    <version>4.19.4.0</version>
 </dependency>
 ```
 

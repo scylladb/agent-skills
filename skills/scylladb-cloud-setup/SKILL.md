@@ -70,7 +70,7 @@ Ask the user which programming language they are using so you can recommend the 
 | Language | Driver                                   | Package                                            |
 | -------- | ----------------------------------------- | --------------------------------------------------- |
 | Python   | scylla-driver                             | `pip install scylla-driver`                        |
-| Java     | java-driver (ScyllaDB's fork, 4.x line)   | `com.scylladb:java-driver-core:4.19.2.2` (Maven). Requires Java 11+ (Java 8 support was dropped in 4.19.2.0). |
+| Java     | java-driver (ScyllaDB's fork, 4.x line)   | `com.scylladb:java-driver-core:4.19.4.0` (Maven). Requires Java 11+ (Java 8 support was dropped in 4.19.2.0). |
 | Go       | gocql (ScyllaDB fork)                     | `replace github.com/gocql/gocql => github.com/scylladb/gocql v1.20.0` in `go.mod` |
 | Rust     | scylla-rust-driver                        | `cargo add scylla`                                 |
 | C#       | scylla-csharp-driver                      | NuGet package                                      |
