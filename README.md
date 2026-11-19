@@ -29,6 +29,7 @@ npx skills add scylladb/agent-skills --skill scylladb-vector-search
 npx skills add scylladb/agent-skills --skill scylladb-alternator
 npx skills add scylladb/agent-skills --skill scylladb-kubernetes
 npx skills add scylladb/agent-skills --skill scylladb-benchmark
+npx skills add scylladb/agent-skills --skill scylladb-java-driver-migration
 ```
 
 ### Claude Code plugin
@@ -64,6 +65,7 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 | [scylladb-alternator](skills/scylladb-alternator/SKILL.md) | Build against ScyllaDB's DynamoDB-compatible API — write isolation policies, load balancing (no single endpoint like real DynamoDB), authentication via CQL roles, and compatibility differences to know before porting a DynamoDB app. |
 | [scylladb-kubernetes](skills/scylladb-kubernetes/SKILL.md) | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, client access & networking, TLS/mTLS & authentication, multi-datacenter, scaling, and monitoring/backup. |
 | [scylladb-benchmark](skills/scylladb-benchmark/SKILL.md) | Load test a ScyllaDB Cloud cluster on AWS with cassandra-stress, from loaders connected through VPC peering. Measure the maximum 50/50 read/write rate at p99 ≤ 10 ms with a measured default recipe, or test the workload of your app, and get a repeatable report with p50, p90, and p99 latency. |
+| [scylladb-java-driver-migration](skills/scylladb-java-driver-migration/SKILL.md) | Migrate a Java application from Java driver 3.x to the ScyllaDB Java driver 4.x: Maven and Gradle coordinates, `CqlSession` and `application.conf`, immutable statements and async code, `java.time` types and codecs, the object mapper, and verification against ScyllaDB. |
 
 The skills follow the [Agent Skills format](https://agentskills.io).
 
