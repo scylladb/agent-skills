@@ -21,7 +21,7 @@ Both must print nothing. A hit means another dependency pulls in a driver; exclu
 
 ## 2. Run Against ScyllaDB
 
-Unit tests with mocked sessions do not exercise codecs, the mapper, or routing. Run the application, or its integration tests, against a real ScyllaDB node. If the project has no environment for that, start one in Docker:
+Unit tests with mocked sessions do not exercise codecs, the mapper, or routing. Run the application, or its integration tests, against a real ScyllaDB node: a test environment the user names, or a local node in Docker. The checks below write and overwrite rows, so never run them against a production or shared cluster unless the user explicitly confirms. To start a local node:
 
 ```bash
 docker run --name scylla -d -p 9042:9042 scylladb/scylla --smp 2 --memory 2G --overprovisioned 1

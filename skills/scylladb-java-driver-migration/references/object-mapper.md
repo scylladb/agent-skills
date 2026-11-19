@@ -6,7 +6,7 @@ How to port code that uses the 3.x mapper (`com.datastax.driver.mapping`) to the
 
 | 3.x | 4.x |
 | --- | --- |
-| `@Table(keyspace = "ks", name = "users")` | `@Entity(defaultKeyspace = "ks")` + `@CqlName("users")` on the class, or pass the keyspace through `@DaoKeyspace` |
+| `@Table(keyspace = "ks", name = "users")` | `@Entity(defaultKeyspace = "ks")` + `@CqlName("users")` on the class, or pass the keyspace through `@DaoKeyspace`. `readConsistency` and `writeConsistency` move to `@StatementAttributes(consistencyLevel = "...")` on each DAO method; without it the default consistency applies. `caseSensitiveKeyspace` and `caseSensitiveTable` become quoted names, as for columns below. |
 | `@UDT(name = "address")` | `@Entity` + `@CqlName("address")`. UDT classes are entities too. |
 | `@Column(name = "x")`, `@Field(name = "x")` | `@CqlName("x")` |
 | `@Column(name = "x", caseSensitive = true)`, same on `@Field` | `@CqlName("\"x\"")`. Without the inner quotes the name is lowercased. |

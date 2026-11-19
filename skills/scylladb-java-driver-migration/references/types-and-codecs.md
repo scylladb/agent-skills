@@ -42,7 +42,7 @@ The temporal getters follow the types above, as listed in [CQL to Java type mapp
 | `getUDTValue` | `getUdtValue` |
 | `getBool` | `getBoolean` (`getBool` still exists as an alias) |
 
-`getString`, `getInt`, `getLong`, `getDouble`, `getFloat`, `getList(name, Class)`, `getSet`, `getMap`, `getTupleValue`, `getObject`, and `isNull` keep their names.
+`getString`, `getInt`, `getLong`, `getDouble`, `getFloat`, `getList(name, Class)`, `getSet`, `getMap`, `getTupleValue`, and `isNull` keep their names. `getObject` does too, but returns the 4.x types: a `timestamp` comes back as `Instant`, so a `(Date)` cast compiles and throws `ClassCastException`.
 
 ## Utility Classes
 

@@ -29,7 +29,7 @@ BoundStatement bound = ps.bind().setUuid("id", id);
 BoundStatement bound2 = ps.boundStatementBuilder().setUuid("id", id).setString("name", name).build();
 ```
 
-After porting, search the code for statement setter calls used as statements on their own line (`^\s*\w+\.set\w+\(.*\);`) and check each one.
+After porting, search the code for setter and batch `add` calls used as statements on their own line (`^\s*\w+\.(set\w+|add|addAll)\(.*\);`) and check each one on a driver statement.
 
 ## Renamed Calls
 
@@ -37,19 +37,19 @@ After porting, search the code for statement setter calls used as statements on 
 | --- | --- |
 | `new SimpleStatement(q, values...)` | `SimpleStatement.newInstance(q, values...)` |
 | `new BoundStatement(ps)` | `ps.bind()` |
-| `new BatchStatement()` / `new BatchStatement(BatchStatement.Type.UNLOGGED)` | `BatchStatement.builder(DefaultBatchType.LOGGED)` / `BatchStatement.builder(DefaultBatchType.UNLOGGED)`, then `.addStatement(s)` and `.build()` |
+| `new BatchStatement()` / `new BatchStatement(BatchStatement.Type.UNLOGGED)` | `BatchStatement.builder(DefaultBatchType.LOGGED)` / `BatchStatement.builder(DefaultBatchType.UNLOGGED)`, then `.addStatement(s)` and `.build()`. A 3.x batch was idempotent when all its statements were; a 4.x batch ignores its statements and takes `basic.request.default-idempotence` (default `false`) unless you call `.setIdempotent(true)` on it. A non-idempotent batch is not retried after a write timeout or request error, nor run speculatively. |
 | `batch.add(s)` | `batch = batch.add(s)`. It returns a new batch, like every setter. |
 | `stmt.setFetchSize(n)` | `stmt.setPageSize(n)` |
-| `stmt.setReadTimeoutMillis(ms)` | `stmt.setTimeout(Duration.ofMillis(ms))` |
+| `stmt.setReadTimeoutMillis(ms)` | `stmt.setTimeout(Duration.ofMillis(ms))`, which covers the whole request; see the timeout rule in SKILL.md. |
 | `stmt.enableTracing()` | `stmt.setTracing(true)` |
 | `stmt.setRetryPolicy(p)` | No per-statement policy. Define an execution profile with its own `advanced.retry-policy` and call `stmt.setExecutionProfileName("name")`. |
-| `stmt.setPagingState(ps)` | `stmt.setPagingState(byteBuffer)` or `stmt.setPagingState(pagingState)` |
+| `stmt.setPagingState(ps)` | `stmt.setPagingState(pagingState)` with a `PagingState` from `getSafePagingState()`. A paging state from another query throws `IllegalArgumentException`, not 3.x `PagingStateException`. The `ByteBuffer` overload skips that check, like 3.x `setPagingStateUnsafe`. |
 | `rs.getExecutionInfo().getPagingState()` | `rs.getExecutionInfo().getSafePagingState()` (a `PagingState`), or `getPagingState()` (a raw `ByteBuffer`) |
 | `PagingState.fromString(s)` / `pagingState.toString()` | `PagingState.fromString(s)` / `pagingState.toString()` on the 4.x `PagingState` type |
 | `rs.getExecutionInfo().getQueryTrace()` | Same name; it blocks. Use `getQueryTraceAsync()` in async code. |
 | `rs.fetchMoreResults()` | Removed. Background prefetch exists only in the async API (see below). |
 
-`session.execute(String query, Object... values)`, `ResultSet.one()`, `all()`, iteration, `wasApplied()`, `getAvailableWithoutFetching()` and `isFullyFetched()` keep their 3.x behavior.
+`session.execute(String query, Object... values)`, `ResultSet.one()`, `all()`, iteration, `getAvailableWithoutFetching()` and `isFullyFetched()` keep their 3.x behavior. Call `wasApplied()` before consuming the rows: after `rs.one()` on a single-row LWT result it throws `IllegalStateException`.
 
 Prepared statements are cached on the client in 4.x: calling `session.prepare(q)` twice returns the same instance. 3.x code that kept its own `ConcurrentHashMap<String, PreparedStatement>` still works; do not remove it during the migration.
 
@@ -96,7 +96,7 @@ private CompletionStage<Void> processPages(AsyncResultSet rs) {
 | `NoHostAvailableException`, `getErrors()` | `AllNodesFailedException`, `getAllErrors()` (a `Map<Node, List<Throwable>>`). `NoNodeAvailableException` is the subclass thrown when no node could be tried. |
 | `OperationTimedOutException` (client-side) | `DriverTimeoutException` |
 | `ReadTimeoutException`, `WriteTimeoutException`, `UnavailableException`, `InvalidQueryException`, `SyntaxError`, `OverloadedException` | Same names in `com.datastax.oss.driver.api.core.servererrors` |
-| `AuthenticationException` | `com.datastax.oss.driver.api.core.auth.AuthenticationException` |
+| `AuthenticationException` | `com.datastax.oss.driver.api.core.auth.AuthenticationException`, no longer a `DriverException`. At startup `build()` throws `AllNodesFailedException` with it in `getAllErrors()`, where 3.x `connect()` threw it directly. |
 | `DriverException` | `com.datastax.oss.driver.api.core.DriverException` |
 
 Failed `CompletionStage`s wrap the cause in `CompletionException` when joined. Unwrap it before matching on the driver exception type.

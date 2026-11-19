@@ -1,15 +1,14 @@
 # Coordinates and Build
 
-How to change the build files when moving from Java driver 3.x to 4.x. The group id stays `com.scylladb`; every artifact name changes. See [What changes for ScyllaDB users](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#what-changes-for-scylladb-users) in the migration guide.
+How to change the build files when moving from Java driver 3.x to 4.x.
 
 ## Artifact Mapping
 
-| 3.x artifact | 4.x artifact(s) |
-| --- | --- |
-| `com.scylladb:scylla-driver-core` | `com.scylladb:java-driver-core`. Add `com.scylladb:java-driver-query-builder` only if the code uses `QueryBuilder`. |
-| `com.scylladb:scylla-driver-mapping` | `com.scylladb:java-driver-mapper-runtime`, plus `com.scylladb:java-driver-mapper-processor` as an annotation processor |
-| `com.scylladb:scylla-driver-extras` | Nothing to add. Most of its codecs are in `java-driver-core` as `ExtraTypeCodecs`; see [types-and-codecs](types-and-codecs.md). |
-| `com.datastax.cassandra:cassandra-driver-core` (DataStax 3.x) | `com.scylladb:java-driver-core`. The 3.x API is the same as ScyllaDB's 3.x, so the rest of this skill applies unchanged. |
+The [What changes for ScyllaDB users](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#what-changes-for-scylladb-users) table in the migration guide maps each `com.scylladb` 3.x artifact to its 4.x replacement. In addition:
+
+- Add `com.scylladb:java-driver-query-builder` only if the code uses `QueryBuilder`.
+- For `scylla-driver-extras`, add nothing: most of its codecs are in `java-driver-core` as `ExtraTypeCodecs`; see [types-and-codecs](types-and-codecs.md).
+- DataStax 3.x, `com.datastax.cassandra:cassandra-driver-core`, also moves to `com.scylladb:java-driver-core`. Its 3.x API is the same as ScyllaDB's 3.x, so the rest of this skill applies unchanged.
 
 Use one version for every `java-driver-*` artifact. The latest is 4.19.4.0; check [Maven Central](https://central.sonatype.com/artifact/com.scylladb/java-driver-core) for newer releases.
 
@@ -76,7 +75,7 @@ If the project already lists other processors there, such as Lombok, add this on
 
 ### Right: Gradle
 
-```kotlin
+```groovy
 dependencies {
     implementation("com.scylladb:java-driver-core:4.19.4.0")
     implementation("com.scylladb:java-driver-query-builder:4.19.4.0")   // only with QueryBuilder
@@ -99,7 +98,7 @@ dependencies {
 
 ## Logging
 
-4.19.4.0 depends on `slf4j-api` 2.x. SLF4J 1.7 bindings are ignored, so the driver logs nothing and the application prints `No SLF4J providers were found` at startup. If the project has a 1.7-era binding, move it to its SLF4J 2 version:
+4.19.2.0 and later depend on `slf4j-api` 2.x; 4.19.0.x uses 1.7, so skip this section there. SLF4J 1.7 bindings are ignored, so the driver logs nothing and the application prints `No SLF4J providers were found` at startup. If the project has a 1.7-era binding, move it to its SLF4J 2 version:
 
 | 1.7 binding | SLF4J 2 binding |
 | --- | --- |
@@ -109,7 +108,7 @@ dependencies {
 
 ## Metrics and JMX
 
-3.x reported metrics to JMX by default. 4.x does not, and session and node metrics are opt-in by name. To keep JMX, add `io.dropwizard.metrics:metrics-jmx` and register the reporter, as described in the [Metrics section](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#metrics) of the migration guide. To use Micrometer instead, add `com.scylladb:java-driver-metrics-micrometer` and set `advanced.metrics.factory.class = MicrometerMetricsFactory`.
+3.x reported metrics to JMX by default. 4.x does not, and session and node metrics are opt-in by name. To keep JMX, add `io.dropwizard.metrics:metrics-jmx`, as the [Metrics section](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#metrics) of the migration guide says, and register a `JmxReporter` on the driver's registry, as shown in the [metrics manual](https://java-driver.docs.scylladb.com/stable/manual/core/metrics/index.md). To use Micrometer instead, add `com.scylladb:java-driver-metrics-micrometer` and set `advanced.metrics.factory.class = MicrometerMetricsFactory`.
 
 ## Both Drivers Side by Side
 

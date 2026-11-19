@@ -33,7 +33,7 @@ Follow these steps in order. After each step, and in steps 5 to 7 after each cla
    # build-files grep: also covers version catalogs and buildSrc
    grep -rnE 'scylla-driver-(core|mapping|extras)|cassandra-driver-(core|mapping|extras)' --include='pom.xml' --include='*.gradle' --include='*.gradle.kts' --include='*.toml' --include='*.sbt' --include='*.kt' .
    # Guava grep
-   grep -rlE 'import com\.google\.common\.' --include='*.java' .
+   grep -rlE 'import (static )?com\.google\.common\.' --include='*.java' --include='*.kt' --include='*.scala' .
    ```
 
    3.x brought Guava in transitively; 4.x shades it, so the imports the Guava grep finds stop compiling unless the build declares Guava itself.
@@ -54,7 +54,7 @@ Steps 5 to 7 go one class at a time, and they are one unit for that class: move 
 - **Keep the `com.datastax.oss.driver.api` imports.** The ScyllaDB 4.x driver keeps the upstream package names. Do not invent `com.scylladb.*` packages.
 - **Set the local datacenter explicitly.** If the 3.x code named one (`withLocalDc`), set the same value with `withLocalDatacenter("<dc>")` or `basic.load-balancing-policy.local-datacenter`. If it did not, ask the user which datacenter is local; do not leave it to inference. Only 4.19.0.9 and 4.19.2.0 or later infer it; other 4.x versions fail at startup without it.
 - **Reassign statements.** 4.x statements are immutable: `stmt.setConsistencyLevel(...)` returns a new statement and leaves `stmt` unchanged. A 3.x-style call whose result is ignored compiles and silently does nothing.
-- **Recheck timeouts.** 3.x `SocketOptions.setReadTimeoutMillis` (default 12 s) applied per attempt. 4.x `basic.request.timeout` (default 11 s since 4.19.2.3, 2 s in older 4.x releases) covers the whole request, retries and speculative executions included.
+- **Recheck timeouts.** 3.x `SocketOptions.setReadTimeoutMillis` (default 12 s) applied per attempt. 4.x `basic.request.timeout` (default 11 s since 4.19.2.3, 2 s in older 4.x releases) covers the whole request, retries and speculative executions included. A request to an unresponsive node no longer moves on to the next node after one attempt's timeout: it waits out the whole timeout and fails with `DriverTimeoutException`. Speculative executions are the closest replacement; ask the user before adding them.
 - **Keep the mapper's column names.** The 4.x mapper defaults to snake case (`firstName` maps to `first_name`); 3.x mapped `firstName` to `firstname`. Without `@NamingStrategy`, creating the DAO fails at startup with `has missing columns: [first_name]`. See [object-mapper](references/object-mapper.md).
 - **Do not drop ScyllaDB features in translation.** Keep rack awareness, shard-aware port settings, and LWT routing; each has a 4.x configuration key in [session-and-configuration](references/session-and-configuration.md).
 - **Change one thing per step.** Do not change the schema, consistency levels, or retry behavior while you migrate, unless the user asks. Behavior must stay the same.

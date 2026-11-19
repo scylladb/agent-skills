@@ -44,14 +44,14 @@ The table configures the new `CqlSession`; leave the 3.x `Cluster` builder as it
 
 | 3.x | 4.x |
 | --- | --- |
-| `addContactPoint(s)("host")` + `withPort(p)` | `addContactPoint(new InetSocketAddress("host", p))`, or `basic.contact-points = ["host:p"]` |
+| `addContactPoint(s)("host")` + `withPort(p)` | `basic.contact-points = ["host:p"]` or `addContactPoint(InetSocketAddress.createUnresolved("host", p))`. 3.x tried every address of a hostname; since 4.19.2.2 these forms try up to `advanced.connection.max-candidate-addresses` (5), while a resolved `new InetSocketAddress("host", p)` is one address. IP literals work in either form. |
 | `cluster.connect("ks")` | `withKeyspace("ks")` |
 | `DCAwareRoundRobinPolicy...withLocalDc("dc1")` | `withLocalDatacenter("dc1")` or `basic.load-balancing-policy.local-datacenter` |
 | `RackAwareRoundRobinPolicy...withLocalRack("r1")` | `basic.load-balancing-policy.local-rack = "r1"` (no builder method) |
 | `withUsedHostsPerRemoteDc(n)` | `advanced.load-balancing-policy.dc-failover.max-nodes-per-remote-dc = n` |
 | `allowRemoteDCsForLocalConsistencyLevel()` | `advanced.load-balancing-policy.dc-failover.allow-for-local-consistency-levels = true` |
 | `LatencyAwarePolicy` | Delete it. `basic.load-balancing-policy.slow-replica-avoidance` (default `true`) replaces it. |
-| `withCredentials(u, p)` | `withAuthCredentials(u, p)`, or `advanced.auth-provider` with `class = PlainTextAuthProvider`, `username = u` and `password = p`. Take the password from the secret the 3.x code read it from, such as `password = ${DB_PASSWORD}` for an environment variable; never hard-code it in code or `application.conf`. |
+| `withCredentials(u, p)` | `withAuthCredentials(u, p)`, or `advanced.auth-provider` with `class = PlainTextAuthProvider`, `username = u` and `password = p`. Take the password from the secret the 3.x code read it from, such as `password = ${DB_PASSWORD}` for an environment variable; never hard-code it in code or `application.conf`. A null or empty password now fails: `withAuthCredentials` throws `NullPointerException: password cannot be null` or `IllegalArgumentException: password cannot be empty` at once, and `application.conf` fails `build()` with `UnresolvedSubstitution`, where 3.x still connected to a node without authentication; if the secret is unset in some environments, configure credentials only where it is set. |
 | `withSSL()` | `advanced.ssl-engine-factory.class = DefaultSslEngineFactory`. It validates hostnames, which 3.x `withSSL()` did not, so a node whose certificate does not match the address the driver connects to now fails the handshake with `No subject alternative DNS name matching ...`. If that happens, tell the user and recommend fixing the node certificates. Set `hostname-validation = false`, or use `withSslContext(...)`, which also skips the check, only for clearly labeled local testing and when the user explicitly asks; never in production. |
 | `withQueryOptions(...setConsistencyLevel(cl))` | `basic.request.consistency` |
 | `...setSerialConsistencyLevel(cl)` | `basic.request.serial-consistency` |
@@ -95,7 +95,7 @@ To keep options in code instead, pass a loader built with `DriverConfigLoader.pr
 
 ## Connection Pool
 
-On ScyllaDB the 4.x driver opens connections per shard. `advanced.connection.pool.local.size` is a total per node, and the driver rounds it up so that every shard gets at least one connection. The default, `1`, therefore means one connection per shard. Do not port 3.x `PoolingOptions` values. Keep the defaults unless the user has measured a need, and see `scylladb-cloud-setup` for pool sizing.
+On ScyllaDB the 4.x driver opens connections per shard. `advanced.connection.pool.local.size` is a total per node, and the driver rounds it up so that every shard gets at least one connection. The default, `1`, therefore means one connection per shard. Do not port 3.x `PoolingOptions` values. Keep the defaults unless the user has measured a need, and see `scylladb-cloud-setup` for pool sizing. 3.x queued a request when every connection was busy (`setMaxQueueSize`, default 256, for up to `setPoolTimeoutMillis`, default 5 s); 4.x has no queue, tries the next node, then fails with `AllNodesFailedException`. If the application relied on that queue, tell the user. The closest 4.x option is `advanced.throttler.class = ConcurrencyLimitingRequestThrottler` with `max-concurrent-requests` and `max-queue-size`, but it limits the whole session rather than each node, counts queued time against `basic.request.timeout`, and fails with `RequestThrottlingException` when its queue is full.
 
 ## Metadata
 
