@@ -24,7 +24,7 @@ Use one version for every `java-driver-*` artifact. The latest is 4.19.4.0; chec
 </dependency>
 ```
 
-The same applies to `com.datastax.oss:java-driver-core`. Both compile against the same API, so the mistake only shows up as lost performance in production.
+The same applies to `com.datastax.oss:java-driver-core`. Code that uses only the common API compiles against either one, and the mistake shows up only as lost performance in production. Code that calls ScyllaDB-only API, such as `Node.getShardingInfo()`, does not compile against them.
 
 ### Right: Maven
 
@@ -61,7 +61,6 @@ The mapper processor goes in the compiler plugin, not in `<dependencies>`:
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-compiler-plugin</artifactId>
   <configuration>
-    <release>11</release>
     <annotationProcessorPaths>
       <path>
         <groupId>com.scylladb</groupId>
@@ -88,7 +87,7 @@ dependencies {
 
 ## Java Version
 
-- 4.19.2.0 and later are compiled for Java 11 (`<release>11</release>`). On Java 8 they fail with `UnsupportedClassVersionError`.
+- 4.19.2.0 and later are compiled for Java 11. On Java 8 they fail with `UnsupportedClassVersionError`. Keep the project's own compiler target unless it is below 11.
 - 4.19.0.x is the last line that runs on Java 8. Use it only if the user cannot move off Java 8, and tell them it is a dead end.
 
 ## Guava
@@ -110,8 +109,14 @@ dependencies {
 
 ## Metrics and JMX
 
-3.x reported metrics to JMX by default. 4.x does not, and session and node metrics are opt-in by name. To keep JMX, add `io.dropwizard.metrics:metrics-jmx` and register the reporter, as described in the [Metrics section](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#metrics) of the migration guide. To use Micrometer instead, add `com.scylladb:java-driver-metrics-micrometer`.
+3.x reported metrics to JMX by default. 4.x does not, and session and node metrics are opt-in by name. To keep JMX, add `io.dropwizard.metrics:metrics-jmx` and register the reporter, as described in the [Metrics section](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#metrics) of the migration guide. To use Micrometer instead, add `com.scylladb:java-driver-metrics-micrometer` and set `advanced.metrics.factory.class = MicrometerMetricsFactory`.
+
+## Both Drivers Side by Side
+
+From step 3 to step 8 both drivers are on the classpath. They need different major versions of `io.dropwizard.metrics:metrics-core`: 3.x needs 3.2.x, 4.19.4.0 brings 4.2.x. Gradle always resolves the newer one; Maven resolves the one from the driver declared first. With metrics-core 4.x, a 3.x `Cluster` with JMX reporting on, the 3.x default, fails at startup with `NoClassDefFoundError: com/codahale/metrics/JmxReporter`.
+
+Add `withoutJMXReporting()` to the 3.x `Cluster.builder()` (or `withoutMetrics()`, if the application does not read 3.x metrics) and keep it until step 8 deletes the `Cluster`. With its default settings, where metrics are off, a 4.x session starts with either metrics-core version.
 
 ## Remove the Old Artifacts
 
-After the code compiles, remove every `scylla-driver-*` and `cassandra-driver-*` dependency, and any exclusion or version pin that existed only for them, such as Guava or Netty pins. Then rerun the first two inventory greps from SKILL.md; they must return nothing. Guava imports may remain if the build now declares `com.google.guava:guava` itself.
+This is step 8. Do it when the driver-imports grep from SKILL.md finds only the 3.x `Cluster` setup, that is, when no other class uses 3.x. Close and delete the `Cluster`, with its `withoutJMXReporting()`. Remove every `scylla-driver-*` and `cassandra-driver-*` dependency, and any exclusion or version pin that existed only for them, such as Guava or metrics-core pins. Then rerun the driver-imports grep and the build-files grep; both must return nothing. The Guava grep may still match if the build now declares `com.google.guava:guava` itself.

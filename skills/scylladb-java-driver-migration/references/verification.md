@@ -5,7 +5,7 @@ How to check a 3.x to 4.x migration before calling it done. A migration that com
 ## 1. Build Checks
 
 1. The project compiles with the 4.x artifacts and with the Java version from [coordinates-and-build](coordinates-and-build.md#java-version).
-2. The first two inventory greps from SKILL.md return nothing. The Guava grep may still match if the build declares Guava directly; see [coordinates-and-build](coordinates-and-build.md#guava).
+2. The driver-imports grep and the build-files grep from SKILL.md return nothing. The Guava grep may still match if the build declares Guava directly; see [coordinates-and-build](coordinates-and-build.md#guava).
 3. The resolved dependency tree has no 3.x driver and no upstream 4.x driver:
 
 ```bash
@@ -17,7 +17,7 @@ mvn dependency:tree | grep -E 'scylla-driver|cassandra-driver|com\.datastax\.oss
 
 Both must print nothing. A hit means another dependency pulls in a driver; exclude it there, or tell the user if that library itself needs 3.x.
 
-4. The project's own tests pass. Do not delete or skip a failing test to make the build green; a failure after migration usually points to one of the silent changes listed in SKILL.md.
+4. The project's own tests pass. Do not delete or skip a failing test to make the build green; a failure after migration usually points to one of the behavior changes in the Rules section of SKILL.md.
 
 ## 2. Run Against ScyllaDB
 
@@ -55,7 +55,7 @@ System.out.println(ran.getConsistencyLevel()); // null: the profile default appl
 
 ## 4. Shard-Aware Routing
 
-The 4.x `com.scylladb` driver routes each request to the right shard. The upstream driver connects to ScyllaDB and runs the same code, but without shard awareness, so check it explicitly:
+The 4.x `com.scylladb` driver routes each request to the right shard. Code that uses only the common API also runs on the upstream driver, without shard awareness, so check it explicitly. The check uses `getShardingInfo()`, which exists only in the ScyllaDB driver; if it does not compile, the build resolved an upstream driver.
 
 ```java
 for (Node node : session.getMetadata().getNodes().values()) {
@@ -66,8 +66,7 @@ for (Node node : session.getMetadata().getNodes().values()) {
 ```
 
 - Against the `--smp 2` container, expect `shards=2` and at least 2 connections, plus the control connection.
-- `shards=none` means the driver is not shard-aware: check the dependency tree again for a `com.datastax.oss` or `org.apache.cassandra` driver.
-- `getShardingInfo()` is also `null` before the node's pool is created, so run the check after the first query.
+- `getShardingInfo()` is `null` before the node's pool is created, so run the check after the first query. `shards=none` after that means the driver got no sharding information from the node.
 
 ## 5. Before Reporting Done
 

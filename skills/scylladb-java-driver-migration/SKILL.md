@@ -23,32 +23,36 @@ For adjacent topics, use the sibling skill instead:
 
 ## Migration Workflow
 
-Follow these steps in order. After each step, build and run the project's tests, and fix failures before you move on. Both drivers stay on the classpath until the code no longer needs 3.x (see [Remove the Old Artifacts](references/coordinates-and-build.md#remove-the-old-artifacts)), so every step can be tested on its own. Steps 4 to 7 can go one class or module at a time.
+Follow these steps in order. After each step, and in steps 5 to 7 after each class, build and run the project's tests, and fix failures before you move on. The 3.x and 4.x packages differ (`com.datastax.driver.core` and `com.datastax.oss.driver.api.core`), so both drivers stay on the classpath from step 3 until step 8, and each class uses one of them.
 
-1. **Inventory.** Find every 3.x usage before you edit anything, and show the user the counts:
+1. **Inventory.** Find every 3.x usage before you edit anything, and show the user the counts. The skill refers to these three commands by name:
 
    ```sh
+   # driver-imports grep
    grep -rlE 'com\.datastax\.driver\.(core|mapping|extras)' --include='*.java' --include='*.kt' --include='*.scala' .
-   grep -rnE 'scylla-driver-(core|mapping|extras)|cassandra-driver-(core|mapping|extras)' --include='pom.xml' --include='*.gradle' --include='*.gradle.kts' --include='*.sbt' .
+   # build-files grep: also covers version catalogs and buildSrc
+   grep -rnE 'scylla-driver-(core|mapping|extras)|cassandra-driver-(core|mapping|extras)' --include='pom.xml' --include='*.gradle' --include='*.gradle.kts' --include='*.toml' --include='*.sbt' --include='*.kt' .
+   # Guava grep
    grep -rlE 'import com\.google\.common\.' --include='*.java' .
    ```
 
-   The last command finds Guava imports. 3.x brought Guava in transitively; 4.x shades it, so these imports stop compiling unless the build declares Guava itself.
+   3.x brought Guava in transitively; 4.x shades it, so the imports the Guava grep finds stop compiling unless the build declares Guava itself.
 2. **Check the Java version.** 4.19.2.0 and later need Java 11 or newer. If the project builds with Java 8, stop and ask the user: move to Java 11+ (recommended), or target the 4.19.0.x line, the last one that runs on Java 8.
-3. **Swap the dependencies.** See [coordinates-and-build](references/coordinates-and-build.md).
-4. **Replace `Cluster` and `Session` with one `CqlSession`**, and move policies and options to `application.conf`. See [session-and-configuration](references/session-and-configuration.md).
-5. **Fix statements, result sets, async code, and exceptions.** See [statements-and-results](references/statements-and-results.md).
-6. **Fix temporal types, getters, and codecs.** See [types-and-codecs](references/types-and-codecs.md).
+3. **Add the 4.x dependencies** next to the 3.x ones, and add `withoutJMXReporting()` to the 3.x `Cluster`: without it, 3.x fails at startup when the build resolves the metrics-core version 4.x brings. See [coordinates-and-build](references/coordinates-and-build.md#both-drivers-side-by-side).
+4. **Open a `CqlSession` next to the 3.x `Cluster`**, with policies and options in `application.conf`. No class uses it yet. See [session-and-configuration](references/session-and-configuration.md).
+5. **Port statements, result sets, async code, and exceptions.** See [statements-and-results](references/statements-and-results.md).
+6. **Port temporal types, getters, and codecs.** See [types-and-codecs](references/types-and-codecs.md).
 7. **Port the object mapper**, if the code uses `com.datastax.driver.mapping`. See [object-mapper](references/object-mapper.md).
-8. **Verify** with the tests and against a running ScyllaDB node. See [verification](references/verification.md).
+8. **Remove 3.x**: close and delete the `Cluster`, then remove the 3.x artifacts. See [Remove the Old Artifacts](references/coordinates-and-build.md#remove-the-old-artifacts).
+9. **Verify** with the tests and against a running ScyllaDB node. See [verification](references/verification.md).
 
-The 3.x and 4.x packages differ (`com.datastax.driver.core` and `com.datastax.oss.driver.api.core`), so a large application can migrate one module at a time with both drivers on the classpath. Keep each class on one driver, and run `mvn dependency:tree` (or `gradle dependencies`) to check for conflicting Netty versions.
+Steps 5 to 7 go one class at a time, and they are one unit for that class: move it from the 3.x `Session` to the `CqlSession` and port its statements, types, and mapper usage together, then build and test. Classes not yet ported keep using 3.x.
 
 ## Rules
 
 - **Use `com.scylladb` artifacts.** The 4.x core is `com.scylladb:java-driver-core`, latest 4.19.4.0. Never switch to `com.datastax.oss` or `org.apache.cassandra`: those drivers have no shard-aware or tablet-aware routing. Parts of the 4.x manual come from upstream and show `org.apache.cassandra`; use `com.scylladb` anyway.
 - **Keep the `com.datastax.oss.driver.api` imports.** The ScyllaDB 4.x driver keeps the upstream package names. Do not invent `com.scylladb.*` packages.
-- **Keep the local datacenter.** If the 3.x code named one (`withLocalDc`), set the same value with `withLocalDatacenter("<dc>")` or `basic.load-balancing-policy.local-datacenter`. If it did not, 4.19.0.9 and 4.19.2.0 or later infer it from the first node they connect to, as 3.x did; older 4.x versions fail at startup without it. Setting it is safer when contact points span datacenters.
+- **Set the local datacenter explicitly.** If the 3.x code named one (`withLocalDc`), set the same value with `withLocalDatacenter("<dc>")` or `basic.load-balancing-policy.local-datacenter`. If it did not, ask the user which datacenter is local; do not leave it to inference. Only 4.19.0.9 and 4.19.2.0 or later infer it; other 4.x versions fail at startup without it.
 - **Reassign statements.** 4.x statements are immutable: `stmt.setConsistencyLevel(...)` returns a new statement and leaves `stmt` unchanged. A 3.x-style call whose result is ignored compiles and silently does nothing.
 - **Recheck timeouts.** 3.x `SocketOptions.setReadTimeoutMillis` (default 12 s) applied per attempt. 4.x `basic.request.timeout` (default 11 s since 4.19.2.3, 2 s in older 4.x releases) covers the whole request, retries and speculative executions included.
 - **Keep the mapper's column names.** The 4.x mapper defaults to snake case (`firstName` maps to `first_name`); 3.x mapped `firstName` to `firstname`. Without `@NamingStrategy`, creating the DAO fails at startup with `has missing columns: [first_name]`. See [object-mapper](references/object-mapper.md).

@@ -33,14 +33,14 @@ try (CqlSession session = CqlSession.builder()
 }
 ```
 
-- Port the local datacenter the 3.x code set. Without one, 4.19.0.9 and 4.19.2.0 or later use the datacenter of the first node they connect to, like 3.x; earlier 4.x versions throw from `build()`.
+- Always set the local datacenter. Port the value the 3.x code set; if it set none, ask the user which datacenter is local rather than leaving it to inference. Only 4.19.0.9 and 4.19.2.0 or later infer it; other 4.x versions throw from `build()` without it.
 - The default policy is already token-aware, and on ScyllaDB also shard-aware and tablet-aware. Delete the `TokenAwarePolicy` and `DCAwareRoundRobinPolicy` wrapping; do not port it as a custom policy.
 - `build()` connects right away. There is no separate `init()` or `connect()`.
-- Create one `CqlSession` per application and share it, as with `Cluster` in 3.x. Close it on shutdown.
+- Create one `CqlSession` per application and share it, as with `Cluster` in 3.x. Close it on shutdown. During the migration it runs next to the 3.x `Cluster` until step 8 in SKILL.md removes 3.x.
 
 ## Builder Calls Mapped to 4.x
 
-Options without a builder method go in `application.conf` on the classpath, under `datastax-java-driver { ... }`. Put them there rather than in code, so they can be changed without a rebuild.
+The table configures the new `CqlSession`; leave the 3.x `Cluster` builder as it is until step 8. Options without a builder method go in `application.conf` on the classpath, under `datastax-java-driver { ... }`. Put them there rather than in code, so they can be changed without a rebuild.
 
 | 3.x | 4.x |
 | --- | --- |
@@ -51,8 +51,8 @@ Options without a builder method go in `application.conf` on the classpath, unde
 | `withUsedHostsPerRemoteDc(n)` | `advanced.load-balancing-policy.dc-failover.max-nodes-per-remote-dc = n` |
 | `allowRemoteDCsForLocalConsistencyLevel()` | `advanced.load-balancing-policy.dc-failover.allow-for-local-consistency-levels = true` |
 | `LatencyAwarePolicy` | Delete it. `basic.load-balancing-policy.slow-replica-avoidance` (default `true`) replaces it. |
-| `withCredentials(u, p)` | `withAuthCredentials(u, p)`, or `advanced.auth-provider` with `class = PlainTextAuthProvider` |
-| `withSSL()` | `withSslContext(SSLContext.getDefault())`, or `advanced.ssl-engine-factory.class = DefaultSslEngineFactory` |
+| `withCredentials(u, p)` | `withAuthCredentials(u, p)`, or `advanced.auth-provider` with `class = PlainTextAuthProvider`, `username = u` and `password = p`. Take the password from the secret the 3.x code read it from, such as `password = ${DB_PASSWORD}` for an environment variable; never hard-code it in code or `application.conf`. |
+| `withSSL()` | `withSslContext(SSLContext.getDefault())`, which does not validate hostnames, like 3.x. Or `advanced.ssl-engine-factory.class = DefaultSslEngineFactory`, which does by default: add `hostname-validation = false` to keep the 3.x behavior, or keep validation only after the user confirms the node certificates match the addresses the driver connects to. Otherwise every handshake fails with `No subject alternative DNS name matching ...`. |
 | `withQueryOptions(...setConsistencyLevel(cl))` | `basic.request.consistency` |
 | `...setSerialConsistencyLevel(cl)` | `basic.request.serial-consistency` |
 | `...setFetchSize(n)` | `basic.request.page-size` |
@@ -65,13 +65,13 @@ Options without a builder method go in `application.conf` on the classpath, unde
 | `withRetryPolicy(DowngradingConsistencyRetryPolicy.INSTANCE)` | `advanced.retry-policy.class = ConsistencyDowngradingRetryPolicy` |
 | `withReconnectionPolicy(new ExponentialReconnectionPolicy(b, m))` | `advanced.reconnection-policy.base-delay`, `max-delay` |
 | `withSpeculativeExecutionPolicy(new ConstantSpeculativeExecutionPolicy(d, n))` | `advanced.speculative-execution-policy` with `class = ConstantSpeculativeExecutionPolicy`, `delay = d`, `max-executions = n + 1` |
-| `withCompression(LZ4)` | `advanced.protocol.compression = lz4`, and add `org.lz4:lz4-java` |
+| `withCompression(LZ4)` | `advanced.protocol.compression = lz4`, and add `at.yawk.lz4:lz4-java` at the version in the driver's parent POM (1.12.1 for 4.19.4.0) |
 | `withAddressTranslator(t)` | `withAddressTranslator(t)` is gone; use `advanced.address-translator.class` |
 | `withoutAdvancedShardAwareness()` | `advanced.connection.advanced-shard-awareness.enabled = false` |
 | `withLocalPortRange(low, high)` | `advanced.connection.advanced-shard-awareness.port-low`, `port-high` |
 | `withClusterName(name)` | `basic.session-name` |
 | `withProtocolVersion(v)` | Delete it. 4.x negotiates the version, also in mixed clusters. |
-| `withoutJMXReporting()`, `withoutMetrics()` | Delete them. Metrics are off by default in 4.x. |
+| `withoutJMXReporting()`, `withoutMetrics()` | Nothing; 4.x metrics are off by default. Keep them on the 3.x `Cluster` until step 8 deletes it; see [Both Drivers Side by Side](coordinates-and-build.md#both-drivers-side-by-side). |
 | `cluster.register(...)` with a `Host.StateListener` or `SchemaChangeListener` | `addNodeStateListener(...)`, `addSchemaChangeListener(...)` on the builder, once per listener. `withNodeStateListener` and `withSchemaChangeListener` replace any listener set before, so with several listeners only the last one would fire. |
 
 Speculative executions: in 3.x, `n` counts the extra executions. In 4.x, `max-executions` includes the first one, so add 1.

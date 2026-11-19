@@ -4,14 +4,7 @@ How to port row access, temporal types, UDTs, and custom codecs to 4.x. See [CQL
 
 ## Temporal Types
 
-4.x maps CQL temporal types to `java.time`. It has no codec for `java.util.Date`.
-
-| CQL type | 3.x Java type | 4.x Java type |
-| --- | --- | --- |
-| `timestamp` | `java.util.Date` | `java.time.Instant` |
-| `date` | `com.datastax.driver.core.LocalDate` | `java.time.LocalDate` |
-| `time` | `long` (nanoseconds since midnight) | `java.time.LocalTime` |
-| `duration` | `com.datastax.driver.core.Duration` | `com.datastax.oss.driver.api.core.data.CqlDuration` |
+4.x maps `timestamp`, `date`, and `time` to `java.time` types, as listed in [CQL to Java type mappings](https://java-driver.docs.scylladb.com/stable/upgrade_guide/from_3x/index.md#cql-to-java-type-mappings), and has no codec for `java.util.Date`. `duration` moves from `com.datastax.driver.core.Duration` to `com.datastax.oss.driver.api.core.data.CqlDuration`.
 
 ### Wrong
 

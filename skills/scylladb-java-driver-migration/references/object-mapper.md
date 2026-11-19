@@ -9,6 +9,7 @@ How to port code that uses the 3.x mapper (`com.datastax.driver.mapping`) to the
 | `@Table(keyspace = "ks", name = "users")` | `@Entity(defaultKeyspace = "ks")` + `@CqlName("users")` on the class, or pass the keyspace through `@DaoKeyspace` |
 | `@UDT(name = "address")` | `@Entity` + `@CqlName("address")`. UDT classes are entities too. |
 | `@Column(name = "x")`, `@Field(name = "x")` | `@CqlName("x")` |
+| `@Column(name = "x", caseSensitive = true)`, same on `@Field` | `@CqlName("\"x\"")`. Without the inner quotes the name is lowercased. |
 | `@PartitionKey(n)`, `@ClusteringColumn(n)` | Same names, in `com.datastax.oss.driver.api.mapper.annotations` |
 | `@Transient` | `@Transient`, or `@TransientProperties` on the class |
 | `@Computed("writetime(v)")` | `@Computed("writetime(v)")` |
