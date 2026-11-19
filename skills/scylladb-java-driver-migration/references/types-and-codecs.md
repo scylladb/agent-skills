@@ -19,8 +19,11 @@ session.execute("INSERT INTO events (id, ts) VALUES (?, ?)", id, new Date());
 ```java
 session.execute("INSERT INTO events (id, ts) VALUES (?, ?)", id, Instant.now());
 
-// If the rest of the application still needs Date, convert at the driver boundary only:
-Date ts = Date.from(row.getInstant("ts"));
+// If the rest of the application still needs Date, convert at the driver boundary only.
+// Date.from() and toInstant() throw on null; 3.x getTimestamp() and setTimestamp() did not.
+Instant read = row.getInstant("ts");
+Date ts = read == null ? null : Date.from(read);
+session.execute("INSERT INTO events (id, ts) VALUES (?, ?)", id, date == null ? null : date.toInstant());
 ```
 
 Positional values passed to `execute(String, Object...)` or `SimpleStatement.newInstance` are checked only at runtime. After porting, grep for `new Date(`, `java.util.Date`, and `.getTime()` near driver calls.
