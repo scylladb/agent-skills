@@ -90,7 +90,7 @@ session.execute("SELECT release_version FROM system.local")
 
 The Java 4.x default load balancing policy is token-aware. To set consistency in `application.conf` instead of code, use `datastax-java-driver.basic.request.consistency = LOCAL_QUORUM` ([configuration](https://java-driver.docs.scylladb.com/stable/manual/core/configuration/index.md)).
 
-If the application uses Java driver 3.x (it imports `com.datastax.driver.core`), use the `scylladb-java-driver-migration` skill to move it to 4.x. That skill is in the `scylladb/java-driver` repository.
+If the application uses Java driver 3.x (it imports `com.datastax.driver.core`) and the user asks to migrate it to 4.x, use the `scylladb-java-driver-migration` skill. That skill is in the `scylladb/java-driver` repository.
 
 ---
 
