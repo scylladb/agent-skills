@@ -25,6 +25,7 @@ For adjacent topics, use the sibling skill instead:
 - Managing ScyllaDB Cloud clusters from an AI agent: `scylladb-cloud-mcp`
 - Self-managed clusters on Kubernetes: `scylladb-kubernetes`
 - DynamoDB SDK clients instead of CQL drivers: `scylladb-alternator`
+- Migration of Java driver 3.x code to 4.x: `scylladb-java-driver-migration`, in the `scylladb/java-driver` repository
 
 ## Overview
 
