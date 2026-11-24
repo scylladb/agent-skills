@@ -65,16 +65,6 @@ Clone this repo and copy the skill folders into the appropriate directory for yo
 | [scylladb-kubernetes](skills/scylladb-kubernetes/SKILL.md) | Deploy and operate ScyllaDB on Kubernetes via the ScyllaDB Operator — node preparation (CPU pinning, XFS/local storage), ScyllaCluster configuration, installation/upgrades, client access & networking, TLS/mTLS & authentication, multi-datacenter, scaling, and monitoring/backup. |
 | [scylladb-benchmark](skills/scylladb-benchmark/SKILL.md) | Load test a ScyllaDB Cloud cluster on AWS with cassandra-stress, from loaders connected through VPC peering. Measure the maximum 50/50 read/write rate at p99 ≤ 10 ms with a measured default recipe, or test the workload of your app, and get a repeatable report with p50, p90, and p99 latency. |
 
-### Skills in other repositories
-
-| Skill | Description |
-|-------|-------------|
-| [scylladb-java-driver-migration](https://github.com/scylladb/java-driver/tree/scylla-4.x/skills/scylladb-java-driver-migration) | Migrate a Java application from Java driver 3.x to 4.x. |
-
-```sh
-npx skills add scylladb/java-driver --skill scylladb-java-driver-migration
-```
-
 The skills follow the [Agent Skills format](https://agentskills.io).
 
 ## Development
