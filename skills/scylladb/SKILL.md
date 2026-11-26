@@ -1,6 +1,6 @@
 ---
 name: scylladb
-description: Overview of ScyllaDB and a map of the ScyllaDB agent skills, with instructions to install or fetch a skill that is missing. Use this skill when starting a project on ScyllaDB or moving an existing project to ScyllaDB, when a task covers more than one ScyllaDB area, or when no more specific ScyllaDB skill matches. Child skill scylladb-data-modeling wins for CQL schemas, keys, indexes, TTL, and compaction. Child skill scylladb-cloud-setup wins for connections, drivers, and credentials. Also use to find the skill for vector, full-text, and hybrid search, the DynamoDB API (Alternator), Kubernetes and the ScyllaDB Operator, the ScyllaDB Cloud MCP server, or benchmarks and load tests of ScyllaDB Cloud. Triggers on "ScyllaDB", "Scylla", "ScyllaDB Cloud", "get started with ScyllaDB", "use ScyllaDB", "migrate to ScyllaDB", "switch to ScyllaDB".
+description: Overview of ScyllaDB and a map of the ScyllaDB agent skills, with instructions to install or fetch a skill that is missing. Use this skill when starting a project on ScyllaDB or moving an existing project to ScyllaDB, when a task covers more than one ScyllaDB area, or when no more specific ScyllaDB skill matches. Child skill scylladb-data-modeling wins for CQL schemas, keys, indexes, TTL, and compaction. Child skill scylladb-cloud-setup wins for connections, drivers, and credentials. Child skill scylladb-java-driver-migration wins for moving Java driver 3.x code to 4.x. Also use to find the skill for vector, full-text, and hybrid search, the DynamoDB API (Alternator), Kubernetes and the ScyllaDB Operator, the ScyllaDB Cloud MCP server, or benchmarks and load tests of ScyllaDB Cloud. Triggers on "ScyllaDB", "Scylla", "ScyllaDB Cloud", "get started with ScyllaDB", "use ScyllaDB", "migrate to ScyllaDB", "switch to ScyllaDB".
 ---
 
 # ScyllaDB
@@ -65,6 +65,7 @@ When the task matches a row, work from that skill and not from this overview.
 | `scylladb-kubernetes` | ScyllaDB Operator, ScyllaCluster, running ScyllaDB on Kubernetes. |
 | `scylladb-cloud-mcp` | Managing ScyllaDB Cloud clusters through the Cloud MCP server. |
 | `scylladb-benchmark` | Benchmarks and load tests of ScyllaDB Cloud with cassandra-stress, p50/p90/p99 latency, maximum throughput under an SLA. |
+| `scylladb-java-driver-migration` | Migrating a Java application from Java driver 3.x to 4.x. This skill is in the `scylladb/java-driver` repository. |
 
 ## Installing the Right Skill
 
@@ -83,3 +84,11 @@ When the task matches a row, work from that skill and not from this overview.
    ```
 
    Fetch its references from the same path, under `references/`. If Node.js is available, `npx skills use scylladb/agent-skills@<skill-name>` prints the skill as a prompt without installing it.
+
+`scylladb-java-driver-migration` is in the `scylladb/java-driver` repository, on the `scylla-4.x` branch. Install it with:
+
+```sh
+npx skills add scylladb/java-driver --skill scylladb-java-driver-migration
+```
+
+Fetch it from `https://raw.githubusercontent.com/scylladb/java-driver/scylla-4.x/skills/scylladb-java-driver-migration/SKILL.md`.
