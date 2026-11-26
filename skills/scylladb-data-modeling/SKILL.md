@@ -80,7 +80,7 @@ As of ScyllaDB 2025.4, `WITH replication` is optional. Use the simple form by de
 CREATE KEYSPACE myapp;
 ```
 
-Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required.
+Explicitly specifying `NetworkTopologyStrategy` and `replication_factor` remains valid but is not required. With replication factor 2, `LOCAL_QUORUM` needs both replicas. For client consistency with RF=2, use the `scylladb-cloud-setup` skill.
 
 Never use `SimpleStrategy`. Tablets support only `NetworkTopologyStrategy`, and many Cassandra tutorials still show `SimpleStrategy`.
 
